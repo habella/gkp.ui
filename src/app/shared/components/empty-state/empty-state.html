@@ -1,0 +1,67 @@
+<div
+  class="empty-state-container flex flex-col items-center justify-center gap-6 p-8 max-w-md mx-auto"
+>
+  <!-- Icono -->
+  <div
+    class="icon-wrapper flex items-center justify-center w-24 h-24 rounded-full bg-surface-100"
+  >
+    <i class="dx-icon dx-icon-{{ icon() }} text-5xl text-surface-400"></i>
+  </div>
+
+  <!-- Textos -->
+  <div class="text-content flex flex-col items-center gap-2 text-center">
+    <h2 class="text-2xl font-semibold text-surface-900">{{ title() }}</h2>
+    <p class="text-base text-surface-600">{{ subtitle() }}</p>
+  </div>
+
+  <!-- Botones -->
+  <div class="actions flex items-center gap-2">
+    @if (showRefreshButton()) {
+    <button
+      type="button"
+      class="list-controls-button refresh"
+      (click)="onRefreshClick()"
+      [disabled]="isLoading()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="23 4 23 10 17 10" />
+        <path d="M20.49 15a9 9 0 1 1-2-8.83" />
+      </svg>
+      <span>{{ refreshButtonText() }}</span>
+    </button>
+    } @if (showCreateButton()) {
+    <button
+      type="button"
+      class="list-controls-button create"
+      (click)="onCreateClick()"
+      [disabled]="isLoading()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      <span>{{ createButtonText() }}</span>
+    </button>
+    }
+  </div>
+</div>

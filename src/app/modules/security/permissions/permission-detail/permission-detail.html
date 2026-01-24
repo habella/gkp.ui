@@ -1,0 +1,130 @@
+<div class="flex flex-col h-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-4">
+      <dx-button
+        icon="back"
+        stylingMode="text"
+        hint="Volver"
+        (onClick)="onCancel()"
+      />
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-900">{{ pageTitle() }}</h1>
+        @if (!isNew()) {
+        <p class="text-sm text-gray-500 mt-1">{{ permission().name }}</p>
+        }
+      </div>
+    </div>
+    <div class="flex gap-2" *hasRoles="['admin', 'super_admin']">
+      <dx-button
+        text="Cancelar"
+        stylingMode="outlined"
+        (onClick)="onCancel()"
+      />
+      <dx-button
+        type="default"
+        stylingMode="contained"
+        [disabled]="saving()"
+        (onClick)="onSave()"
+        class="!rounded-sm shadow-sm"
+      >
+        <div
+          *dxTemplate="let data of 'content'"
+          class="flex items-center gap-2 px-2"
+        >
+          @if (saving()) {
+          <dx-load-indicator [visible]="true" height="18" width="18" />
+          <span>Guardando...</span>
+          } @else {
+          <i class="dx-icon-save text-lg"></i>
+          <span>Guardar</span>
+          }
+        </div>
+      </dx-button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  @if (loading()) {
+  <div class="flex items-center justify-center flex-1">
+    <dx-load-indicator [visible]="true" height="40" width="40" />
+  </div>
+  } @else {
+  <div class="flex-1 min-h-0 bg-white rounded-lg shadow overflow-hidden">
+    <div class="p-6">
+      <div class="grid grid-cols-2 gap-6 max-w-3xl">
+        <!-- Nombre -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre <span class="text-red-500">*</span>
+          </label>
+          <dx-text-box
+            [value]="formData().name"
+            (valueChange)="updateFormField('name', $event)"
+            placeholder="Ingrese el nombre del permiso"
+            width="100%"
+          />
+        </div>
+
+        <!-- Grupo -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Grupo <span class="text-red-500">*</span>
+          </label>
+          <dx-text-box
+            [value]="formData().group"
+            (valueChange)="updateFormField('group', $event)"
+            placeholder="Ej: Usuarios, Reportes, Configuración"
+            width="100%"
+          />
+        </div>
+
+        <!-- Sub-Grupo -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Sub-Grupo</label
+          >
+          <dx-text-box
+            [value]="formData().subGroup || ''"
+            (valueChange)="updateFormField('subGroup', $event || null)"
+            placeholder="Opcional: sub-categoría"
+            width="100%"
+          />
+        </div>
+
+        <!-- Descripción -->
+        <div class="col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Descripción <span class="text-red-500">*</span>
+          </label>
+          <dx-text-area
+            [value]="formData().description"
+            (valueChange)="updateFormField('description', $event)"
+            placeholder="Describa qué permite hacer este permiso"
+            [height]="100"
+            width="100%"
+          />
+        </div>
+      </div>
+
+      <!-- Help text -->
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg max-w-3xl">
+        <h4 class="text-sm font-medium text-blue-800 mb-2">
+          💡 Consejos para crear permisos
+        </h4>
+        <ul class="text-sm text-blue-700 space-y-1">
+          <li>
+            • Use nombres descriptivos y concisos (ej: "users.create",
+            "reports.view")
+          </li>
+          <li>• Agrupe permisos relacionados usando el mismo grupo</li>
+          <li>
+            • La descripción debe explicar claramente qué acciones permite el
+            permiso
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  }
+</div>

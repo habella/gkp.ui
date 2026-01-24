@@ -1,0 +1,220 @@
+.tabs-header {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0;
+  flex-shrink: 0;
+
+  &.no-top-border {
+    border-top: none;
+  }
+}
+
+.tab-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 16px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+
+  &:hover:not(.disabled):not(.locked) {
+    color: #374151;
+  }
+
+  &.active {
+    color: #3b82f6;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.locked {
+    opacity: 0.7;
+    cursor: not-allowed;
+    color: #9ca3af;
+  }
+
+  &.is-action {
+    color: #6b7280;
+
+    &:hover:not(.disabled):not(.locked) {
+      color: #3b82f6;
+    }
+  }
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.tab-lock-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.tab-label {
+  line-height: 1;
+}
+
+// Badge base
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  min-width: 18px;
+  line-height: 1;
+}
+
+// Badge variants
+.tab-badge-default {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.tab-badge-primary {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.tab-badge-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.tab-badge-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.tab-badge-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.tab-badge-info {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.tab-badge-custom {
+  color: #ffffff;
+}
+
+.tabs-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  padding: 0 12px;
+  color: #6b7280;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.tabs-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; // Importante para que flex funcione correctamente
+}
+
+.tab-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; // Permite que el contenido se ajuste
+
+  &.active {
+    animation: fadeIn 0.15s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Variante underline (por defecto)
+.tabs-underline {
+  .tab-button {
+    &.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #3b82f6;
+    }
+  }
+}
+
+// Variante pills
+.tabs-pills {
+  gap: 4px;
+  border-bottom: none;
+  padding: 4px;
+  background: #f3f4f6;
+  border-radius: 6px;
+
+  .tab-button {
+    padding: 6px 12px;
+    border-radius: 4px;
+
+    &.active {
+      background: #ffffff;
+      color: #1f2937;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+// Variante default (sin línea inferior)
+.tabs-default {
+  border-bottom: none;
+
+  .tab-button {
+    &.active {
+      background: #eff6ff;
+      border-radius: 4px;
+    }
+  }
+}

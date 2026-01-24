@@ -1,0 +1,511 @@
+<!-- Modern Dashboard - Wind Farm Management -->
+<div
+  class="h-full w-full overflow-hidden flex flex-col bg-gradient-to-br from-slate-50 via-white to-blue-50/30"
+>
+  <!-- Dashboard Header -->
+  <div
+    class="flex-shrink-0 px-8 py-6 border-b border-surface-200/60 bg-white/80 backdrop-blur-sm"
+  >
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <div
+            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/20"
+          >
+            <app-svg-icon
+              path="icons/bar-chart-square-01.svg"
+              class="bg-white"
+              style="width: 24px; height: 24px"
+            ></app-svg-icon>
+          </div>
+          <div
+            class="absolute -bottom-1 -right-1 w-4 h-4 bg-energy-400 rounded-full border-2 border-white flex items-center justify-center"
+          >
+            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-surface-900 tracking-tight">
+            Panel de Control
+          </h1>
+          <p class="text-sm text-surface-500 flex items-center gap-2">
+            <span
+              class="w-2 h-2 bg-energy-400 rounded-full animate-pulse"
+            ></span>
+            Monitorización en tiempo real
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <p
+            class="text-xs text-surface-400 uppercase tracking-wider font-medium"
+          >
+            Última actualización
+          </p>
+          <p class="text-sm font-semibold text-surface-700">
+            {{ lastUpdateTime() }}
+          </p>
+        </div>
+        <button
+          class="group flex items-center gap-2 px-4 py-2.5 bg-white border border-surface-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all duration-200"
+        >
+          <svg
+            class="w-4 h-4 text-surface-500 group-hover:text-primary-500 group-hover:rotate-180 transition-all duration-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          <span
+            class="text-sm font-medium text-surface-600 group-hover:text-primary-600"
+            >Actualizar</span
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="flex-1 overflow-auto p-8">
+    <!-- Hero Stats Row -->
+    <div class="grid grid-cols-6 gap-5 mb-8">
+      <!-- Main Stat Card - Production -->
+      <div class="col-span-2 stat-card stat-card-accent group cursor-pointer">
+        <div class="flex items-start justify-between">
+          <div>
+            <p
+              class="text-sm font-medium text-white/80 uppercase tracking-wider mb-1"
+            >
+              Producción Actual
+            </p>
+            <div class="flex items-baseline gap-2">
+              <span class="metric-value-lg text-white"
+                >{{ currentProduction() }}</span
+              >
+              <span class="text-xl text-white/60">MW</span>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <span class="metric-change up !bg-white/20 !text-white">
+                <svg
+                  class="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 10l7-7m0 0l7 7m-7-7v18"
+                  ></path>
+                </svg>
+                +12.5%
+              </span>
+              <span class="text-xs text-white/60">vs mes anterior</span>
+            </div>
+          </div>
+          <div
+            class="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform"
+          >
+            <app-svg-icon
+              path="icons/trend-up-01.svg"
+              class="bg-white"
+              style="width: 28px; height: 28px"
+            ></app-svg-icon>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-white/20">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-white/70">Capacidad utilizada</span>
+            <span class="font-semibold text-white"
+              >{{ ((currentProduction() / totalCapacity()) * 100).toFixed(1)
+              }}%</span
+            >
+          </div>
+          <div class="mt-2 h-2 bg-white/20 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-white rounded-full transition-all duration-500"
+              [style.width.%]="(currentProduction() / totalCapacity()) * 100"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular Stat Cards -->
+      <div class="stat-card group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-11 h-11 rounded-xl bg-primary-100 flex items-center justify-center group-hover:scale-110 transition-transform"
+          >
+            <app-svg-icon
+              path="icons/building-01.svg"
+              class="bg-primary-600"
+              style="width: 22px; height: 22px"
+            ></app-svg-icon>
+          </div>
+          <span class="metric-change up">
+            <svg
+              class="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 10l7-7m0 0l7 7m-7-7v18"
+              ></path>
+            </svg>
+            +2
+          </span>
+        </div>
+        <div class="metric-value text-surface-900">{{ totalPlants() }}</div>
+        <p class="metric-label mt-1">Plantas Activas</p>
+      </div>
+
+      <div class="stat-card group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-11 h-11 rounded-xl bg-energy-100 flex items-center justify-center group-hover:scale-110 transition-transform"
+          >
+            <app-svg-icon
+              path="icons/velocity-signal.svg"
+              class="bg-energy-600"
+              style="width: 22px; height: 22px"
+            ></app-svg-icon>
+          </div>
+          <span
+            class="text-xs font-medium px-2 py-1 bg-energy-100 text-energy-700 rounded-full"
+            >Activas</span
+          >
+        </div>
+        <div class="metric-value text-surface-900">{{ totalTurbines() }}</div>
+        <p class="metric-label mt-1">Turbinas Totales</p>
+      </div>
+
+      <div class="stat-card group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-11 h-11 rounded-xl bg-accent-100 flex items-center justify-center group-hover:scale-110 transition-transform"
+          >
+            <app-svg-icon
+              path="icons/bar-chart-10.svg"
+              class="bg-accent-600"
+              style="width: 22px; height: 22px"
+            ></app-svg-icon>
+          </div>
+        </div>
+        <div class="metric-value text-surface-900">
+          {{ totalCapacity() }}
+          <span class="text-lg font-normal text-surface-400">MW</span>
+        </div>
+        <p class="metric-label mt-1">Capacidad Total</p>
+      </div>
+
+      <div class="stat-card group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-11 h-11 rounded-xl bg-primary-100 flex items-center justify-center group-hover:scale-110 transition-transform"
+          >
+            <app-svg-icon
+              path="icons/globe-02.svg"
+              class="bg-primary-600"
+              style="width: 22px; height: 22px"
+            ></app-svg-icon>
+          </div>
+        </div>
+        <div class="metric-value text-gradient-energy">
+          {{ (co2Saved() / 1000).toFixed(1) }}k
+          <span class="text-lg font-normal text-surface-400">t</span>
+        </div>
+        <p class="metric-label mt-1">CO₂ Evitado</p>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-3 gap-6 mb-8">
+      <!-- Production Chart -->
+      <div class="col-span-2 chart-container">
+        <div class="chart-header">
+          <div>
+            <h3 class="chart-title">Producción Mensual</h3>
+            <p class="chart-subtitle">
+              Comparativa producción vs objetivo (MW)
+            </p>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-primary-500"></div>
+              <span class="text-sm text-surface-600">Producción</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-surface-300"></div>
+              <span class="text-sm text-surface-600">Objetivo</span>
+            </div>
+          </div>
+        </div>
+        <dx-chart
+          id="productionChart"
+          [dataSource]="productionData"
+          [palette]="['#007ed1', '#e2e8f0']"
+          class="h-[300px]"
+        >
+          <dxi-series
+            valueField="production"
+            argumentField="month"
+            name="Producción"
+            type="bar"
+          ></dxi-series>
+          <dxi-series
+            valueField="target"
+            argumentField="month"
+            name="Objetivo"
+            type="spline"
+            color="#94a3b8"
+          ></dxi-series>
+          <dxo-common-series-settings
+            argumentField="month"
+          ></dxo-common-series-settings>
+          <dxo-legend [visible]="false"></dxo-legend>
+          <dxo-tooltip [enabled]="true" [shared]="true"></dxo-tooltip>
+        </dx-chart>
+      </div>
+
+      <!-- Status Distribution -->
+      <div class="chart-container">
+        <div class="mb-4">
+          <h3 class="chart-title">Estado de Turbinas</h3>
+          <p class="chart-subtitle">Distribución actual del parque</p>
+        </div>
+        <dx-pie-chart
+          id="statusPie"
+          [dataSource]="statusDistribution"
+          [palette]="['#10b981', '#f59e0b', '#ef4444']"
+          class="h-[200px]"
+          type="doughnut"
+          [innerRadius]="0.7"
+        >
+          <dxi-series argumentField="status" valueField="count">
+            <dxo-label [visible]="false"></dxo-label>
+          </dxi-series>
+          <dxo-legend [visible]="false"></dxo-legend>
+          <dxo-tooltip [enabled]="true"></dxo-tooltip>
+        </dx-pie-chart>
+        <div class="mt-6 space-y-3">
+          @for (item of statusDistribution; track item.status) {
+          <div
+            class="flex items-center justify-between p-3 rounded-xl bg-surface-50 hover:bg-surface-100 transition-colors"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [style.backgroundColor]="item.color"
+              ></div>
+              <span class="text-sm font-medium text-surface-700"
+                >{{ item.status }}</span
+              >
+            </div>
+            <span class="text-sm font-bold text-surface-900"
+              >{{ item.count }}</span
+            >
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Plants & Alerts Row -->
+    <div class="grid grid-cols-3 gap-6">
+      <!-- Plants List -->
+      <div class="col-span-2 card-premium overflow-hidden">
+        <div class="p-6 border-b border-surface-100">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-surface-900">
+                Resumen de Plantas
+              </h3>
+              <p class="text-sm text-surface-500 mt-0.5">
+                Estado y producción actual por planta
+              </p>
+            </div>
+            <button
+              class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            >
+              Ver todas
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="divide-y divide-surface-100">
+          @for (plant of plants(); track plant.id; let i = $index) {
+          <div
+            class="p-5 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-transparent transition-all cursor-pointer group"
+            [style.animation-delay.ms]="i * 50"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary-200/50 transition-all"
+                >
+                  <app-svg-icon
+                    path="icons/velocity-signal.svg"
+                    class="bg-primary-600"
+                    style="width: 24px; height: 24px"
+                  ></app-svg-icon>
+                </div>
+                <div>
+                  <h4
+                    class="font-semibold text-surface-900 group-hover:text-primary-600 transition-colors"
+                  >
+                    {{ plant.name }}
+                  </h4>
+                  <p class="text-sm text-surface-500 flex items-center gap-1">
+                    <svg
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      ></path>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      ></path>
+                    </svg>
+                    {{ plant.location }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-8">
+                <div class="text-center">
+                  <div class="text-sm font-bold text-surface-900">
+                    {{ plant.turbines }}
+                  </div>
+                  <div class="text-xs text-surface-400">Turbinas</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-sm font-bold text-surface-900">
+                    {{ plant.capacity }} MW
+                  </div>
+                  <div class="text-xs text-surface-400">Capacidad</div>
+                </div>
+                <div class="text-center min-w-[80px]">
+                  <div class="text-sm font-bold text-energy-600">
+                    {{ plant.production }} MW
+                  </div>
+                  <div class="text-xs text-surface-400">
+                    {{ plant.efficiency }}% efic.
+                  </div>
+                </div>
+                <span
+                  [class]="'px-3 py-1.5 rounded-lg text-xs font-semibold ' + getStatusClass(plant.status)"
+                >
+                  {{ getStatusLabel(plant.status) }}
+                </span>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Recent Alerts -->
+      <div class="card-premium overflow-hidden">
+        <div class="p-6 border-b border-surface-100">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-surface-900">
+                Alertas Recientes
+              </h3>
+              <p class="text-sm text-surface-500 mt-0.5">
+                Últimas notificaciones
+              </p>
+            </div>
+            <span
+              class="flex items-center justify-center w-7 h-7 bg-danger-100 text-danger-600 text-xs font-bold rounded-lg"
+            >
+              {{ recentAlerts().length }}
+            </span>
+          </div>
+        </div>
+        <div class="p-4 space-y-3">
+          @for (alert of recentAlerts(); track alert.id) {
+          <div [class]="'alert-card ' + alert.type">
+            <div
+              class="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center"
+              [class]="alert.type === 'error' ? 'bg-danger-100' : alert.type === 'warning' ? 'bg-accent-100' : 'bg-primary-100'"
+            >
+              <app-svg-icon
+                [path]="getAlertIcon(alert.type)"
+                [class]="alert.type === 'error' ? 'bg-danger-500' : alert.type === 'warning' ? 'bg-accent-600' : 'bg-primary-500'"
+                style="width: 18px; height: 18px"
+              ></app-svg-icon>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-surface-800 line-clamp-2">
+                {{ alert.message }}
+              </p>
+              <div class="flex items-center gap-2 mt-1.5">
+                <span class="text-xs font-medium text-surface-600"
+                  >{{ alert.plant }}</span
+                >
+                <span class="w-1 h-1 bg-surface-300 rounded-full"></span>
+                <span class="text-xs text-surface-400"
+                  >{{ formatTime(alert.timestamp) }}</span
+                >
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        <div class="p-4 border-t border-surface-100">
+          <button
+            class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-surface-600 hover:text-primary-600 bg-surface-50 hover:bg-primary-50 rounded-xl transition-all"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              ></path>
+            </svg>
+            Ver todas las alertas
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

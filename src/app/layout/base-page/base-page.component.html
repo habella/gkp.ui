@@ -1,0 +1,286 @@
+<div class="flex w-full h-screen select-none bg-slate-100">
+  <!-- Sidebar Minimizado - Oscuro -->
+  <aside
+    class="h-screen w-[60px] flex flex-col bg-slate-900 relative z-40 transition-all duration-300"
+  >
+    <!-- Logo Container -->
+    <div class="flex items-center justify-center py-4">
+      <div class="relative cursor-pointer" (click)="isMaximized = !isMaximized">
+        <div
+          class="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center"
+        >
+          <img
+            src="icons/cube-02.svg"
+            alt="fleet"
+            class="w-5 h-5 brightness-0 invert"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Icons -->
+    <nav
+      class="flex-1 py-2 flex flex-col items-center gap-1 overflow-y-auto overflow-x-hidden"
+    >
+      @for (item of menu$ | async; track item.menuItem.ID) {
+      <div class="group relative">
+        <button
+          class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200"
+          [ngClass]="{ '!bg-slate-800 !text-white': isGroupActive(item) }"
+          (click)="toggleExpanded(item)"
+        >
+          <app-svg-icon
+            [path]="'icons/' + item.menuItem.icon + '.svg'"
+            class="bg-current"
+            style="width: 1.25rem; height: 1.25rem"
+          ></app-svg-icon>
+        </button>
+        <!-- Tooltip -->
+        <div
+          class="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-[9999]"
+        >
+          {{ item.menuItem.name }}
+        </div>
+      </div>
+      }
+    </nav>
+
+    <!-- Bottom Section -->
+    <div class="mt-auto py-4 flex flex-col items-center gap-2">
+      <!-- User Avatar -->
+      <div class="relative cursor-pointer" (click)="isMaximized = !isMaximized">
+        <img
+          class="w-9 h-9 rounded-full border-2 border-slate-700"
+          src="images/profile.png"
+          alt="Profile"
+        />
+        <div
+          class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-slate-900"
+        ></div>
+      </div>
+      <!-- Logout Button -->
+      <button
+        class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200"
+        (click)="logout()"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 22 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M16 16.9999L21 11.9999M21 11.9999L16 6.99994M21 11.9999H9M12 16.9999C12 17.2955 12 17.4433 11.989 17.5713C11.8748 18.9019 10.8949 19.9968 9.58503 20.2572C9.45903 20.2823 9.31202 20.2986 9.01835 20.3312L7.99694 20.4447C6.46248 20.6152 5.69521 20.7005 5.08566 20.5054C4.27293 20.2453 3.60942 19.6515 3.26118 18.8724C3 18.2881 3 17.5162 3 15.9722V8.02764C3 6.4837 3 5.71174 3.26118 5.12746C3.60942 4.34842 4.27293 3.75454 5.08566 3.49447C5.69521 3.29941 6.46246 3.38466 7.99694 3.55516L9.01835 3.66865C9.31212 3.70129 9.45901 3.71761 9.58503 3.74267C10.8949 4.0031 11.8748 5.09798 11.989 6.42855C12 6.55657 12 6.70436 12 6.99994"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Overlay -->
+  @if (isMaximized) {
+  <div
+    class="fixed inset-0 bg-black/20 z-[5000]"
+    (click)="isMaximized = false"
+  ></div>
+  }
+
+  <!-- Panel Expandido - Blanco/Claro -->
+  @if (isMaximized) {
+  <div
+    class="z-[10000] h-full fixed w-[280px] top-0 left-[60px] flex flex-col bg-white shadow-2xl animate-slide-in-left overflow-hidden border-r border-slate-200"
+  >
+    <!-- Menu Items con Secciones -->
+    <div class="flex-1 overflow-y-auto py-4">
+      @for (item of menu$ | async; track item.menuItem.ID) {
+      <div class="mb-4">
+        <!-- Section Title -->
+        <div class="px-5 py-2">
+          <span
+            class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+            >{{ item.menuItem.name }}</span
+          >
+        </div>
+
+        <!-- Subitems -->
+        <div class="space-y-0.5 px-3">
+          @for (itemSubMenu of item.subnodes; track itemSubMenu.menuItem.ID) {
+          <div *hasRoles="itemSubMenu.menuItem.roles">
+            <!-- Item con posible submenú -->
+            @if (itemSubMenu.subnodes.length > 0) {
+            <button
+              class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 group"
+              [ngClass]="{
+                'bg-slate-100 text-slate-900':
+                  expandedSubmenus[itemSubMenu.menuItem.ID],
+                'text-slate-600 hover:bg-slate-50 hover:text-slate-900':
+                  !expandedSubmenus[itemSubMenu.menuItem.ID]
+              }"
+              (click)="toggleSubmenu(itemSubMenu.menuItem.ID)"
+            >
+              <app-svg-icon
+                [path]="'icons/' + itemSubMenu.menuItem.icon + '.svg'"
+                class="bg-slate-500 group-hover:bg-slate-700"
+                style="width: 18px; height: 18px"
+              ></app-svg-icon>
+              <span class="flex-1 text-sm font-medium">{{
+                itemSubMenu.menuItem.name
+              }}</span>
+              <svg
+                class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                [ngClass]="{
+                  'rotate-180': expandedSubmenus[itemSubMenu.menuItem.ID]
+                }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <!-- Submenu Level 3 -->
+            @if (expandedSubmenus[itemSubMenu.menuItem.ID]) {
+            <div
+              class="ml-4 mt-1 space-y-0.5 border-l-2 border-slate-200 pl-4 py-1"
+            >
+              @for (itemLevel3 of itemSubMenu.subnodes; track
+              itemLevel3.menuItem.ID) {
+              <button
+                *hasRoles="itemLevel3.menuItem.roles"
+                class="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-all duration-200"
+                [ngClass]="{
+                  'bg-primary-50 text-primary-600': isMenuItemActive(
+                    itemLevel3.menuItem.path ?? ''
+                  ),
+                  'text-slate-500 hover:bg-slate-50 hover:text-slate-700':
+                    !isMenuItemActive(itemLevel3.menuItem.path ?? '')
+                }"
+                (click)="navigationChanged(itemLevel3.menuItem.path ?? '')"
+              >
+                <app-svg-icon
+                  [path]="'icons/' + itemLevel3.menuItem.icon + '.svg'"
+                  class="bg-current"
+                  style="width: 14px; height: 14px"
+                ></app-svg-icon>
+                <span class="text-sm">{{ itemLevel3.menuItem.name }}</span>
+              </button>
+              }
+            </div>
+            } } @else {
+            <!-- Item sin submenú -->
+            <button
+              class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 group"
+              [ngClass]="{
+                'bg-primary-50 text-primary-600': isMenuItemActive(
+                  itemSubMenu.menuItem.path ?? ''
+                ),
+                'text-slate-600 hover:bg-slate-50 hover:text-slate-900':
+                  !isMenuItemActive(itemSubMenu.menuItem.path ?? '')
+              }"
+              (click)="navigationChanged(itemSubMenu.menuItem.path ?? '')"
+            >
+              <app-svg-icon
+                [path]="'icons/' + itemSubMenu.menuItem.icon + '.svg'"
+                [ngClass]="{
+                  'bg-primary-500': isMenuItemActive(
+                    itemSubMenu.menuItem.path ?? ''
+                  ),
+                  'bg-slate-500 group-hover:bg-slate-700': !isMenuItemActive(
+                    itemSubMenu.menuItem.path ?? ''
+                  )
+                }"
+                style="width: 18px; height: 18px"
+              ></app-svg-icon>
+              <span class="flex-1 text-sm font-medium">{{
+                itemSubMenu.menuItem.name
+              }}</span>
+              @if (itemSubMenu.subnodes.length > 0) {
+              <svg
+                class="w-4 h-4 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+              }
+            </button>
+            }
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- User Section -->
+    <div class="mt-auto border-t border-slate-200 bg-slate-50">
+      <div class="p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="relative">
+            <img
+              class="w-10 h-10 rounded-full"
+              src="./images/profile.png"
+              alt="Profile"
+            />
+            <div
+              class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"
+            ></div>
+          </div>
+          <div class="flex-1 min-w-0">
+            @if (user$ | async; as user) {
+            <p class="text-sm font-semibold text-slate-900 truncate">
+              {{ user.firstName }} {{ user.lastName }}
+            </p>
+            <p class="text-xs text-slate-500 truncate">{{ user.email }}</p>
+            }
+          </div>
+        </div>
+        <button
+          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200"
+          (click)="logout()"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            ></path>
+          </svg>
+          Salir
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Main Content -->
+  <main
+    class="flex-1 h-full min-h-0 flex flex-col overflow-hidden transition-all duration-300 bg-slate-100"
+    [ngClass]="{ 'blur-sm pointer-events-none': isMaximized }"
+  >
+    <router-outlet></router-outlet>
+  </main>
+</div>

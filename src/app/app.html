@@ -1,0 +1,8 @@
+<loading-overlay
+  [visible]="ui.isLoading()"
+  [title]="ui.loadingTitle()"
+  [subtitle]="ui.loadingSubtitle()"
+  [position]="'fixed'"
+/>
+
+<router-outlet></router-outlet>

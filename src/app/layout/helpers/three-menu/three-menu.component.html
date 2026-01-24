@@ -1,0 +1,48 @@
+<ul class="list-none">
+  <ng-container [ngTemplateOutlet]="renderNodes" [ngTemplateOutletContext]="{ items: items(), level: 0 }"></ng-container>
+</ul>
+
+<ng-template #renderNodes let-items="items" let-level="level">
+  @for (node of items; track $index) {
+    <li class="mb-1">
+      <!-- Contenedor del ítem -->
+      <div
+        class="flex items-center cursor-pointer select-none rounded p-1 hover:bg-gray-100 transition-colors duration-200"
+        (click)="node.children?.length ? toggle(node) : onLeafClick.emit(node)"
+      >
+        <!-- Flecha o ícono para expandir/contraer si tiene hijos -->
+        <span [class.mr-1]="level > 0">
+          @if (node.children?.length) {
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 transition-transform duration-200"
+            [class.transform]="node.expanded"
+            [class.rotate-90]="node.expanded"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5l7 7-7 7" />
+          </svg>
+          }
+          <!-- Solo mostrar el espacio reservado si no es nivel 0 o root -->
+          @if(!node.children?.length && level > 0){
+            <span class="inline-block w-4"></span>
+          }
+        </span>
+         @if (node.icon) {
+          <svg-icon [src]="'./icons/'+ node.icon" [svgStyle]="{ 'width.rem':1, 'height.rem':1 }" class="h-5 w-5 mr-1" />
+         }
+
+        <span class="transition-colors duration-200 hover:font-medium">{{ node.label }}</span>
+      </div>
+
+      @if(node.expanded && node.children?.length)
+      {
+        <ul class="ml-4 border-l border-gray-300 pl-2 mt-1">
+          <ng-container [ngTemplateOutlet]="renderNodes" [ngTemplateOutletContext]="{ items: node.children, level: level + 1 }"></ng-container>
+        </ul>
+      }
+    </li>
+  }
+</ng-template>

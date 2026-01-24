@@ -1,0 +1,143 @@
+[{
+    "ID": "0_0_0",
+    "name": "Assets",
+    "icon": "map-01"
+  },
+  {
+    "ID": "0_2_0",
+    "name": "Gestion",
+    "icon": "archive"
+  },
+  {
+    "ID": "0_1_0",
+    "name": "More",
+    "icon": "dots-vertical"
+  },
+  {
+    "ID": "0_3_0",
+    "name": "Seguridad",
+    "icon": "shield-tick"
+  },
+  {
+    "ID": "0_3_1",
+    "groupId": "0_3_0",
+    "name": "Usuarios",
+    "path": "users",
+    "icon": "users-01",
+    "roles": ["admin", "super_admin"]
+  },
+  {
+    "ID": "0_3_2",
+    "groupId": "0_3_0",
+    "name": "Roles",
+    "path": "roles",
+    "icon": "shield-01",
+    "roles": ["admin", "super_admin"]
+  },
+  {
+    "ID": "0_3_3",
+    "groupId": "0_3_0",
+    "name": "Permisos",
+    "path": "permissions",
+    "icon": "key-01",
+    "roles": ["admin", "super_admin"]
+  },
+  {
+    "ID": "0_0_1",
+    "groupId": "0_2_0",
+    "name": "Events",
+    "path": "event",
+    "icon": "alert-circle",
+    "roles": []
+  },
+  {
+    "ID": "0_0_2",
+    "groupId": "0_2_0",
+    "name": "Meeting",
+    "path": "meeting",
+    "icon": "users-01",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_1_0",
+    "name": "Contact",
+    "path": "contact",
+    "icon": "user-square",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_0_0",
+    "name": "Locations",
+    "path": "locations",
+    "icon": "marker-pin-01",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_0_0",
+    "name": "Plants",
+    "path": "plant",
+    "icon": "dots-grid",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_2_0",
+    "name": "Contract",
+    "path": "contract",
+    "icon": "certificate-01",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_2_0",
+    "name": "Permission",
+    "path": "permission",
+    "icon": "book-open-01",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_2_0",
+    "name": "Planning",
+    "path": "event-planning",
+    "icon": "calendar-date",
+    "roles": []
+  },
+  {
+    "ID": "0_0_3",
+    "groupId": "0_1_0",
+    "name": "Companies",
+    "path": "company",
+    "icon": "building-01",
+    "roles": []
+  },
+  {
+    "ID": "1_0_0",
+    "name": "Configuración",
+    "path": "settings",
+    "icon": "settings-03",
+    "roles": []
+  },
+  {
+    "ID": "1_0_2",
+    "groupId": "1_0_0",
+    "name": "Gestión de usuarios",
+    "path": "workspace-list",
+    "icon": "marker-pin-01",
+    "roles": [
+      "ceo",
+      "super_admin"
+    ]
+  },
+  {
+    "ID": "1_0_3",
+    "groupId": "1_0_0",
+    "name": "Maestro detalles",
+    "path": "master-details",
+    "icon": "marker-pin-01",
+    "roles": []
+  }
+]

@@ -1,0 +1,180 @@
+<div class="flex flex-col h-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Usuarios</h1>
+      <p class="text-sm text-gray-500 mt-1">Gestión de usuarios del sistema</p>
+    </div>
+    <div class="flex gap-2">
+      <dx-button
+        text="Actualizar"
+        icon="refresh"
+        hint="Refrescar"
+        type="success"
+        stylingMode="contained"
+        class="!rounded-sm shadow-sm"
+        (onClick)="onRefresh()"
+      />
+      <div class="flex gap-2" *hasRoles='["admin", "super_admin"]'>
+        <dx-button
+          text="Nuevo Usuario"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="onCreateUser()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="flex-1 min-h-0 bg-white rounded-lg shadow overflow-hidden">
+    @if (loading()) {
+    <div class="flex items-center justify-center h-full">
+      <dx-load-indicator [visible]="true" height="40" width="40" />
+    </div>
+    } @else {
+    <dx-data-grid
+      [dataSource]="users()"
+      [showBorders]="false"
+      [showRowLines]="true"
+      [showColumnLines]="false"
+      [rowAlternationEnabled]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [wordWrapEnabled]="false"
+      height="100%"
+      keyExpr="id"
+    >
+      <dxo-paging [pageSize]="20" />
+      <dxo-pager
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 20, 50, 100]"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      />
+      <dxo-filter-row [visible]="true" />
+      <dxo-header-filter [visible]="true" />
+      <dxo-search-panel
+        [visible]="false"
+        [width]="240"
+        placeholder="Buscar..."
+      />
+      <dxo-selection mode="single" />
+      <dxo-scrolling mode="virtual" />
+
+      <dxi-column
+        caption="Acciones"
+        [width]="100"
+        [allowFiltering]="false"
+        [allowSorting]="false"
+        [allowResizing]="false"
+        [allowReordering]="false"
+        [fixed]="true"
+        cellTemplate="actionsTemplate"
+        alignment="center"
+      />
+      <dxi-column
+        dataField="email"
+        caption="Email"
+        [minWidth]="200"
+        cssClass="font-medium"
+      />
+      <dxi-column
+        caption="Nombre Completo"
+        [calculateCellValue]="getFullName"
+        [minWidth]="180"
+      />
+      <dxi-column dataField="firstName" caption="Nombre" [visible]="false" />
+      <dxi-column dataField="lastName" caption="Apellido" [visible]="false" />
+      <dxi-column
+        dataField="status"
+        caption="Estado"
+        [width]="160"
+        alignment="center"
+        cellTemplate="statusTemplate"
+        [allowFiltering]="true"
+      />
+
+      <!-- Status Template -->
+      <div *dxTemplate="let data of 'statusTemplate'">
+        <span [class]="getStatusClass(data.value)">
+          {{ getStatusText(data.value) }}
+        </span>
+      </div>
+
+      <!-- Actions Template -->
+      <div
+        *dxTemplate="let data of 'actionsTemplate'"
+        class="flex items-center justify-center gap-1"
+      >
+        <dx-button
+          icon="edit"
+          hint="Editar"
+          stylingMode="text"
+          (onClick)="onEditUser(data.data)"
+        />
+        @if (data.data.status !== 0) {
+        <dx-button
+          icon="remove"
+          hint="Desactivar"
+          stylingMode="text"
+          type="danger"
+          (onClick)="onDeactivateUser(data.data)"
+          *hasRoles="['admin', 'super_admin']"
+        />
+        } @else {
+        <dx-button
+          icon="check"
+          hint="Activar"
+          stylingMode="text"
+          type="success"
+          (onClick)="onActivateUser(data.data)"
+          *hasRoles="['admin', 'super_admin']"
+        />
+        }
+      </div>
+    </dx-data-grid>
+    }
+  </div>
+</div>
+
+<!-- Status Change Modal -->
+<app-modal
+  [isOpen]="showStatusModal()"
+  [title]="statusModalTitle()"
+  [confirmText]="statusAction() === 'activate' ? 'Activar' : 'Desactivar'"
+  [confirmVariant]="statusAction() === 'activate' ? 'success' : 'danger'"
+  [confirmLoading]="statusLoading()"
+  (closed)="closeStatusModal()"
+  (cancelled)="closeStatusModal()"
+  (confirmed)="confirmStatusChange()"
+>
+  <p class="text-gray-600">{{ statusModalMessage() }}</p>
+</app-modal>
+
+<!-- Create User Modal -->
+<app-modal
+  [isOpen]="showCreateModal()"
+  title="Nuevo Usuario"
+  confirmText="Crear Usuario"
+  [confirmLoading]="createLoading()"
+  (closed)="closeCreateModal()"
+  (cancelled)="closeCreateModal()"
+  (confirmed)="confirmCreate()"
+>
+  <div class="py-2">
+    <dx-form [formData]="createFormData()" [colCount]="1" labelLocation="top">
+      <dxi-item dataField="email" [label]="{ text: 'Email' }">
+        <dxi-validation-rule type="required" message="Email es requerido" />
+        <dxi-validation-rule type="email" message="Email no válido" />
+      </dxi-item>
+      <dxi-item dataField="firstName" [label]="{ text: 'Nombre' }">
+        <dxi-validation-rule type="required" message="Nombre es requerido" />
+      </dxi-item>
+      <dxi-item dataField="lastName" [label]="{ text: 'Apellido' }">
+        <dxi-validation-rule type="required" message="Apellido es requerido" />
+      </dxi-item>
+    </dx-form>
+  </div>
+</app-modal>

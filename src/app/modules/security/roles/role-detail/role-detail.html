@@ -1,0 +1,326 @@
+<div class="flex flex-col h-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-4">
+      <dx-button
+        icon="back"
+        stylingMode="text"
+        hint="Volver"
+        (onClick)="onCancel()"
+      />
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-900">{{ pageTitle() }}</h1>
+        @if (!isNew()) {
+        <p class="text-sm text-gray-500 mt-1">{{ role().name }}</p>
+        }
+      </div>
+    </div>
+    @if (activeTab() === 'info') {
+    <div class="flex gap-2" *hasRoles="['admin', 'super_admin']">
+      <dx-button
+        text="Cancelar"
+        stylingMode="outlined"
+        (onClick)="onCancel()"
+      />
+      <dx-button
+        type="default"
+        stylingMode="contained"
+        [disabled]="saving()"
+        (onClick)="onSave()"
+        class="!rounded-sm shadow-sm"
+      >
+        <div
+          *dxTemplate="let data of 'content'"
+          class="flex items-center gap-2 px-2"
+        >
+          @if (saving()) {
+          <dx-load-indicator [visible]="true" height="18" width="18" />
+          <span>Guardando...</span>
+          } @else {
+          <i class="dx-icon-save text-lg"></i>
+          <span>Guardar</span>
+          }
+        </div>
+      </dx-button>
+    </div>
+    }
+  </div>
+
+  <!-- Content -->
+  @if (loading()) {
+  <div class="flex items-center justify-center flex-1">
+    <dx-load-indicator [visible]="true" height="40" width="40" />
+  </div>
+  } @else {
+  <div class="flex-1 min-h-0 bg-white rounded-lg shadow overflow-hidden">
+    @if (isNew()) {
+    <!-- New Role Form -->
+    <div class="p-6">
+      <div class="max-w-md">
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Nombre del Rol</label
+        >
+        <dx-text-box
+          [value]="formData().name"
+          (valueChange)="updateFormField('name', $event)"
+          placeholder="Ingrese el nombre del rol"
+          width="100%"
+        />
+      </div>
+    </div>
+    } @else {
+    <!-- Existing Role - Tabs -->
+    <app-tabs [(activeTab)]="activeTab" variant="underline">
+      <!-- Tab: Información General -->
+      <app-tab label="Información General" id="info">
+        <div class="p-6">
+          <div class="max-w-md">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Nombre del Rol</label
+            >
+            <dx-text-box
+              [value]="formData().name"
+              (valueChange)="updateFormField('name', $event)"
+              placeholder="Ingrese el nombre del rol"
+              width="100%"
+            />
+          </div>
+        </div>
+      </app-tab>
+
+      <!-- Tab: Permisos -->
+      <app-tab label="Permisos" id="permissions">
+        <ng-template #tabActions>
+          <div class="flex gap-2">
+            <dx-button
+              text="Actualizar"
+              icon="refresh"
+              hint="Refrescar"
+              type="success"
+              stylingMode="contained"
+              class="!rounded-sm shadow-sm"
+              (onClick)="onRefreshPermissions()"
+            />
+            <dx-button
+              text="Asignar Permiso"
+              icon="plus"
+              stylingMode="contained"
+              type="default"
+              class="!rounded-sm shadow-sm"
+              (onClick)="onAddPermission()"
+              *hasRoles="['admin', 'super_admin']"
+            />
+          </div>
+        </ng-template>
+
+        <div class="p-4 h-full flex flex-col">
+          @if (permissionsLoading()) {
+          <div class="flex items-center justify-center h-32">
+            <dx-load-indicator [visible]="true" height="30" width="30" />
+          </div>
+          } @else if (rolePermissions().length === 0) {
+          <div
+            class="flex flex-col items-center justify-center h-32 text-gray-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-12 w-12 mb-2 text-gray-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            <p>No hay permisos asignados</p>
+          </div>
+          } @else {
+          <dx-data-grid
+            [dataSource]="rolePermissions()"
+            [showBorders]="false"
+            [showRowLines]="true"
+            [showColumnLines]="false"
+            [rowAlternationEnabled]="true"
+            [columnAutoWidth]="false"
+            [allowColumnResizing]="true"
+            [wordWrapEnabled]="false"
+            height="100%"
+            keyExpr="id"
+          >
+            <dxo-filter-row [visible]="true" />
+            <dxo-header-filter [visible]="true" />
+            <dxo-group-panel [visible]="false" />
+            <dxo-grouping [autoExpandAll]="true" />
+            <dxo-paging [pageSize]="15" />
+            <dxo-pager
+              [showPageSizeSelector]="true"
+              [allowedPageSizes]="[15, 30, 50]"
+              [showInfo]="true"
+              [showNavigationButtons]="true"
+            />
+
+            <dxi-column
+              caption="Acciones"
+              [width]="100"
+              [allowFiltering]="false"
+              [allowSorting]="false"
+              [allowResizing]="false"
+              [allowReordering]="false"
+              [fixed]="true"
+              cellTemplate="actionsTemplate"
+              alignment="center"
+            />
+            <dxi-column
+              name="group"
+              caption="Grupo"
+              [groupIndex]="0"
+              [calculateCellValue]="getPermissionGroup.bind(this)"
+            />
+            <dxi-column
+              name="subgroup"
+              caption="Subgrupo"
+              [groupIndex]="1"
+              [calculateCellValue]="getPermissionSubGroup.bind(this)"
+            />
+            <dxi-column
+              name="permission_name"
+              caption="Permiso"
+              [width]="250"
+              [calculateCellValue]="getPermissionName.bind(this)"
+            />
+            <dxi-column
+              name="permission_description"
+              caption="Descripción"
+              [calculateCellValue]="getPermissionDescription.bind(this)"
+            />
+            <div *dxTemplate="let data of 'actionsTemplate'">
+              @if (!data.data.items) {
+              <dx-button
+                icon="trash"
+                hint="Remover permiso"
+                stylingMode="text"
+                type="danger"
+                (onClick)="onRemovePermission(data.data)"
+                *hasRoles="['admin', 'super_admin']"
+              />
+              }
+            </div>
+          </dx-data-grid>
+          }
+        </div>
+      </app-tab>
+    </app-tabs>
+    }
+  </div>
+  }
+</div>
+
+<!-- Add Permission Modal -->
+<app-modal
+  [isOpen]="showAddPermissionModal()"
+  title="Asignar Permisos"
+  confirmText="Asignar Seleccionados"
+  confirmIcon="plus"
+  [confirmLoading]="addPermissionLoading()"
+  [confirmDisabled]="selectedPermissionIds().length === 0"
+  (closed)="closeAddPermissionModal()"
+  (cancelled)="closeAddPermissionModal()"
+  (confirmed)="confirmAddPermission()"
+  size="full"
+>
+  <div class="flex flex-col h-[75vh]">
+    <div
+      class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md shadow-sm"
+    >
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="dx-icon-info text-blue-500 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-bold text-blue-800">
+            Instrucciones de asignación
+          </h3>
+          <div class="mt-1 text-sm text-blue-700">
+            <p>
+              Seleccione uno o más permisos para asignar. Puede buscar y filtrar
+              por cualquier campo para una selección más rápida.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 min-h-0 relative">
+      <dx-data-grid
+        [dataSource]="permissionsForSelect()"
+        [showBorders]="true"
+        [showRowLines]="true"
+        [height]="'100%'"
+        [columnAutoWidth]="true"
+        [allowColumnResizing]="true"
+        keyExpr="id"
+        (onSelectionChanged)="onSelectionChanged($event)"
+      >
+        <dxo-selection
+          mode="multiple"
+          selectAllMode="allPages"
+          showCheckBoxesMode="always"
+        />
+        <dxo-search-panel [visible]="false" />
+        <dxo-filter-row [visible]="true" />
+        <dxo-header-filter [visible]="true" />
+        <dxo-grouping [autoExpandAll]="true" />
+        <dxo-group-panel [visible]="false" />
+        <dxo-scrolling mode="virtual" />
+
+        <dxi-column dataField="group" caption="Grupo" [groupIndex]="0" />
+        <dxi-column
+          dataField="subGroup"
+          caption="Subgrupo"
+          [groupIndex]="1"
+          [calculateCellValue]="getPermissionSubGroup.bind(this)"
+        />
+        <dxi-column
+          dataField="name"
+          caption="Permiso"
+          [minWidth]="250"
+          [sortIndex]="0"
+          sortOrder="asc"
+        />
+        <dxi-column dataField="description" caption="Descripción" />
+      </dx-data-grid>
+    </div>
+
+    @if (permissionsForSelect().length === 0) {
+    <div class="flex flex-col items-center justify-center py-8 text-gray-500">
+      <i class="dx-icon-info text-4xl mb-2 text-gray-300"></i>
+      <p>No hay más permisos disponibles para asignar</p>
+    </div>
+    }
+  </div>
+</app-modal>
+
+<!-- Remove Permission Modal -->
+<app-modal
+  [isOpen]="showRemovePermissionModal()"
+  title="Remover Permiso"
+  confirmText="Remover"
+  confirmVariant="danger"
+  [confirmLoading]="removePermissionLoading()"
+  (closed)="closeRemovePermissionModal()"
+  (cancelled)="closeRemovePermissionModal()"
+  (confirmed)="confirmRemovePermission()"
+>
+  <p class="text-gray-600">
+    ¿Está seguro de remover el permiso
+    <strong
+      >{{ getPermissionName(selectedRolePermission()?.permissionId || '')
+      }}</strong
+    >
+    de este rol?
+  </p>
+</app-modal>

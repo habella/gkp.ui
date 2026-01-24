@@ -1,0 +1,170 @@
+<div class="flex flex-col h-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Permisos</h1>
+      <p class="text-sm text-gray-500 mt-1">Gestión de permisos del sistema</p>
+    </div>
+    <div class="flex gap-2">
+      <dx-button
+        text="Actualizar"
+        icon="refresh"
+        hint="Refrescar"
+        type="success"
+        stylingMode="contained"
+        class="!rounded-sm shadow-sm"
+        (onClick)="onRefresh()"
+      />
+      <div class="flex gap-2" *hasRoles='["admin", "super_admin"]'>
+        <dx-button
+          text="Nuevo Permiso"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="onCreatePermission()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="flex-1 min-h-0 bg-white rounded-lg shadow overflow-hidden">
+    @if (loading()) {
+    <div class="flex items-center justify-center h-full">
+      <dx-load-indicator [visible]="true" height="40" width="40" />
+    </div>
+    } @else {
+    <dx-data-grid
+      [dataSource]="permissions()"
+      [showBorders]="false"
+      [showRowLines]="true"
+      [showColumnLines]="false"
+      [rowAlternationEnabled]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [wordWrapEnabled]="false"
+      height="100%"
+      keyExpr="id"
+    >
+      <dxo-paging [pageSize]="20" />
+      <dxo-pager
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 20, 50, 100]"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      />
+      <dxo-filter-row [visible]="true" />
+      <dxo-header-filter [visible]="true" />
+      <dxo-search-panel
+        [visible]="false"
+        [width]="240"
+        placeholder="Buscar..."
+      />
+      <dxo-selection mode="single" />
+      <dxo-scrolling mode="virtual" />
+      <dxo-group-panel [visible]="false" />
+      <dxo-grouping [autoExpandAll]="true" />
+
+      <dxi-column
+        caption="Acciones"
+        [width]="100"
+        [allowFiltering]="false"
+        [allowSorting]="false"
+        [allowResizing]="false"
+        [allowReordering]="false"
+        [fixed]="true"
+        cellTemplate="actionsTemplate"
+        alignment="center"
+      />
+      <dxi-column
+        dataField="group"
+        caption="Grupo"
+        [width]="150"
+        [groupIndex]="0"
+      />
+      <dxi-column
+        dataField="subGroup"
+        caption="Subgrupo"
+        [width]="150"
+        [groupIndex]="1"
+      />
+      <dxi-column dataField="name" caption="Nombre" [width]="250" />
+      <dxi-column dataField="description" caption="Descripción" />
+
+      <!-- Actions Template -->
+      <div
+        *dxTemplate="let data of 'actionsTemplate'"
+        class="flex items-center justify-center gap-1"
+      >
+        @if (!data.data.items) {
+        <dx-button
+          icon="edit"
+          hint="Editar"
+          stylingMode="text"
+          (onClick)="onEditPermission(data.data)"
+        />
+        <dx-button
+          icon="trash"
+          hint="Eliminar"
+          stylingMode="text"
+          type="danger"
+          (onClick)="onDeletePermission(data.data)"
+          *hasRoles="['admin', 'super_admin']"
+        />
+        }
+      </div>
+    </dx-data-grid>
+    }
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<app-modal
+  [isOpen]="showDeleteModal()"
+  title="Eliminar Permiso"
+  confirmText="Eliminar"
+  confirmVariant="danger"
+  [confirmLoading]="deleteLoading()"
+  (closed)="closeDeleteModal()"
+  (cancelled)="closeDeleteModal()"
+  (confirmed)="confirmDelete()"
+>
+  <p class="text-gray-600">
+    ¿Está seguro de eliminar el permiso
+    <strong>{{ selectedPermission()?.name }}</strong>? Esta acción no se puede
+    deshacer y podría afectar roles que tengan este permiso asignado.
+  </p>
+</app-modal>
+<!-- Create Permission Modal -->
+<app-modal
+  [isOpen]="showCreateModal()"
+  title="Nuevo Permiso"
+  confirmText="Crear Permiso"
+  [confirmLoading]="createLoading()"
+  (closed)="closeCreateModal()"
+  (cancelled)="closeCreateModal()"
+  (confirmed)="confirmCreate()"
+>
+  <div class="py-2">
+    <dx-form [formData]="createFormData()" [colCount]="1" labelLocation="top">
+      <dxi-item dataField="name" [label]="{ text: 'Nombre' }">
+        <dxi-validation-rule type="required" message="El nombre es requerido" />
+      </dxi-item>
+      <dxi-item
+        dataField="description"
+        editorType="dxTextArea"
+        [label]="{ text: 'Descripción' }"
+      >
+        <dxi-validation-rule
+          type="required"
+          message="La descripción es requerida"
+        />
+      </dxi-item>
+      <dxi-item dataField="group" [label]="{ text: 'Grupo' }">
+        <dxi-validation-rule type="required" message="El grupo es requerido" />
+      </dxi-item>
+      <dxi-item dataField="subGroup" [label]="{ text: 'Subgrupo (Opcional)' }">
+      </dxi-item>
+    </dx-form>
+  </div>
+</app-modal>

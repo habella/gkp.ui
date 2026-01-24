@@ -1,0 +1,441 @@
+<div class="flex flex-col h-full bg-slate-50">
+  <!-- Top Navigation / Header -->
+  <div class="p-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <dx-button
+        icon="back"
+        stylingMode="text"
+        hint="Volver"
+        (onClick)="onCancel()"
+      />
+      <div class="h-4 w-px bg-gray-300 mx-1"></div>
+      <span class="text-gray-500 text-sm">Seguridad</span>
+      <i class="dx-icon-chevronright text-[10px] text-gray-400"></i>
+      <span class="text-gray-500 text-sm">Usuarios</span>
+      <i class="dx-icon-chevronright text-[10px] text-gray-400"></i>
+      <span class="text-gray-900 text-sm font-semibold"
+        >{{ isNew() ? 'Nuevo Registro' : 'Perfil de Usuario' }}</span
+      >
+    </div>
+
+    @if (isNew()) {
+    <div class="flex gap-2">
+      <dx-button
+        text="Cancelar"
+        stylingMode="outlined"
+        (onClick)="onCancel()"
+      />
+      <dx-button
+        type="default"
+        stylingMode="contained"
+        [disabled]="saving()"
+        (onClick)="onSave()"
+        class="!rounded-sm shadow-sm"
+      >
+        <div
+          *dxTemplate="let data of 'content'"
+          class="flex items-center gap-2 px-2"
+        >
+          @if (saving()) {
+          <dx-load-indicator [visible]="true" height="18" width="18" />
+          <span>Guardando...</span>
+          } @else {
+          <i class="dx-icon-save text-lg"></i>
+          <span>Guardar</span>
+          }
+        </div>
+      </dx-button>
+    </div>
+    }
+  </div>
+
+  @if (loading()) {
+  <div class="flex items-center justify-center flex-1">
+    <dx-load-indicator [visible]="true" height="40" width="40" />
+  </div>
+  } @else {
+  <div class="flex-1 overflow-y-auto">
+    <!-- Profile Header Section -->
+    <div class="px-6 pb-6 pt-2">
+      <div
+        class="bg-white rounded-sm shadow-sm border border-gray-200 overflow-hidden"
+      >
+        <!-- Subtle Cover/Banner -->
+        <div class="h-24 bg-slate-100 relative border-b border-gray-100">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-slate-100 to-slate-200/50"
+          ></div>
+        </div>
+
+        <!-- Profile Detail Wrapper -->
+        <div class="px-8 pb-6">
+          <div
+            class="flex flex-col md:flex-row gap-8 items-end -mt-10 relative z-10"
+          >
+            <!-- Avatar Area -->
+            <div class="relative group">
+              <div
+                class="h-32 w-32 rounded-sm bg-white p-1 shadow-md border border-gray-200 overflow-hidden"
+              >
+                <img
+                  [src]="user().email ? 'https://ui-avatars.com/api/?name=' + user().firstName + '+' + user().lastName + '&background=f1f5f9&color=475569&size=200&bold=true&rounded=false' : 'assets/images/profile-placeholder.png'"
+                  class="h-full w-full object-cover bg-slate-50"
+                  alt="Perfil"
+                />
+              </div>
+            </div>
+
+            <!-- Identity Info -->
+            <div class="flex-1 min-w-0 pb-1">
+              <div class="flex flex-wrap items-center gap-3 mb-1">
+                <h1
+                  class="text-2xl font-bold text-gray-900 tracking-tight truncate"
+                >
+                  {{ user().firstName }} {{ user().lastName }}
+                </h1>
+                <span
+                  [class]="getStatusClass(user().status)"
+                  class="!px-2 !py-0.5 !font-semibold rounded-sm"
+                >
+                  {{ getStatusText(user().status) }}
+                </span>
+              </div>
+              <p class="text-slate-500 font-medium flex items-center gap-2">
+                <span
+                  class="bg-slate-100 px-1.5 py-0.5 rounded-sm text-[10px] text-slate-600 uppercase font-bold tracking-wider"
+                  >ID Usuario</span
+                >
+                <span class="text-gray-400 font-mono text-xs"
+                  >#{{ user().id.substring(0, 8) || '00000000' }}</span
+                >
+              </p>
+            </div>
+
+            <!-- Quick Stats/Info -->
+            <div
+              class="hidden lg:flex flex-col gap-2 py-1 border-l border-gray-100 pl-8 mr-4"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="h-8 w-8 rounded-sm bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100/50"
+                >
+                  <i class="dx-icon-card text-lg"></i>
+                </div>
+                <div>
+                  <label
+                    class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight"
+                    >Cargo</label
+                  >
+                  <span class="text-xs font-semibold text-slate-700"
+                    >{{ (userRoles().length > 0) ?
+                    getRoleName(userRoles()[0].roleId) : 'Sin asignar' }}</span
+                  >
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div
+                  class="h-8 w-8 rounded-sm bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100/50"
+                >
+                  <i class="dx-icon-clock text-lg"></i>
+                </div>
+                <div>
+                  <label
+                    class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight"
+                    >Último Acceso</label
+                  >
+                  <span class="text-xs font-semibold text-slate-700"
+                    >Hace 3 min</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Actions -->
+            <div class="flex items-center gap-2 pb-1 ml-auto">
+              <dx-button
+                [icon]="user().status === 1 ? 'close' : 'check'"
+                [text]="user().status === 1 ? 'Desactivar' : 'Activar'"
+                [type]="user().status === 1 ? 'danger' : 'default'"
+                stylingMode="outlined"
+                class="!rounded-sm !h-9"
+                (onClick)="onToggleStatus()"
+                *ngIf="!isNew()"
+              />
+              <dx-button
+                icon="edit"
+                text="Editar Perfil"
+                type="default"
+                stylingMode="contained"
+                class="!rounded-sm !h-9 shadow-sm"
+                (onClick)="onSave()"
+                *ngIf="!isNew()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats & Information Tabs Section -->
+    <div class="px-6 pb-8 min-h-[400px]">
+      <div
+        class="bg-white rounded-sm border border-gray-200 flex flex-col h-full"
+      >
+        <app-tabs
+          [(activeTab)]="activeTab"
+          variant="underline"
+          class="h-full flex flex-col"
+        >
+          <!-- ABOUT / INFO Tab -->
+          <app-tab label="Información" id="info">
+            <div class="p-8 max-w-5xl">
+              @if (isNew()) {
+              <dx-form
+                [formData]="formData()"
+                [colCount]="2"
+                labelLocation="top"
+              >
+                <dxi-item dataField="email" [label]="{ text: 'Email' }">
+                  <dxi-validation-rule
+                    type="required"
+                    message="Email es requerido"
+                  />
+                  <dxi-validation-rule type="email" message="Email no válido" />
+                </dxi-item>
+                <dxi-item dataField="firstName" [label]="{ text: 'Nombre' }">
+                  <dxi-validation-rule
+                    type="required"
+                    message="Nombre es requerido"
+                  />
+                </dxi-item>
+                <dxi-item dataField="lastName" [label]="{ text: 'Apellido' }">
+                  <dxi-validation-rule
+                    type="required"
+                    message="Apellido es requerido"
+                  />
+                </dxi-item>
+              </dx-form>
+              } @else {
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+                <div class="group">
+                  <label
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block"
+                    >Nombre Completo</label
+                  >
+                  <div class="flex items-center gap-3 text-slate-700">
+                    <i class="dx-icon-user text-slate-300 text-base"></i>
+                    <p class="text-base font-semibold">
+                      {{ user().firstName }} {{ user().lastName }}
+                    </p>
+                  </div>
+                </div>
+                <div class="group">
+                  <label
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block"
+                    >Correo Electrónico</label
+                  >
+                  <div class="flex items-center gap-3 text-slate-700">
+                    <i class="dx-icon-email text-slate-300 text-base"></i>
+                    <p class="text-base font-semibold">{{ user().email }}</p>
+                    <dx-button
+                      icon="copy"
+                      stylingMode="text"
+                      hint="Copiar email"
+                      class="!h-6 !w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      (onClick)="copyToClipboard(user().email)"
+                    />
+                  </div>
+                </div>
+                <div class="group">
+                  <label
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block"
+                    >Nombre de usuario</label
+                  >
+                  <div class="flex items-center gap-3 text-slate-700">
+                    <i class="dx-icon-key text-slate-300 text-base"></i>
+                    <p class="text-base font-semibold">{{ user().email }}</p>
+                  </div>
+                </div>
+                <div class="group">
+                  <label
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block"
+                    >Fecha Creación</label
+                  >
+                  <div class="flex items-center gap-3 text-slate-700">
+                    <i class="dx-icon-event text-slate-300 text-base"></i>
+                    <p class="text-base font-semibold">
+                      {{ user().createdAt | date:'longDate':'':'es' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </app-tab>
+
+          <!-- ROLES Tab -->
+          <app-tab
+            label="Roles Asignados"
+            id="roles"
+            [badge]="userRoles().length"
+          >
+            <ng-template #tabActions>
+              <div class="flex gap-2">
+                <dx-button
+                  text="Actualizar"
+                  icon="refresh"
+                  hint="Refrescar"
+                  type="success"
+                  stylingMode="contained"
+                  class="!rounded-sm shadow-sm"
+                  (onClick)="onRefreshRoles()"
+                />
+                <dx-button
+                  text="Asignar Nuevo Rol"
+                  icon="plus"
+                  type="default"
+                  stylingMode="contained"
+                  class="!rounded-sm shadow-sm"
+                  (onClick)="onAddRole()"
+                  *hasRoles="['admin', 'super_admin']"
+                />
+              </div>
+            </ng-template>
+
+            <div class="p-4 h-full">
+              @if (rolesLoading()) {
+              <div class="flex items-center justify-center h-48">
+                <dx-load-indicator [visible]="true" height="30" width="30" />
+              </div>
+              } @else if (userRoles().length === 0) {
+              <div
+                class="flex flex-col items-center justify-center h-64 text-slate-400 bg-slate-50/50 rounded-sm border border-dashed border-slate-200 m-4"
+              >
+                <div class="bg-white p-3 rounded-sm shadow-sm mb-4">
+                  <i class="dx-icon-group text-3xl text-slate-200"></i>
+                </div>
+                <p class="text-sm font-medium">
+                  No hay roles asignados a este usuario
+                </p>
+                <button
+                  (click)="onAddRole()"
+                  class="mt-2 text-indigo-600 font-semibold text-xs hover:underline"
+                >
+                  Asignar primer rol
+                </button>
+              </div>
+              } @else {
+              <dx-data-grid
+                [dataSource]="userRoles()"
+                [showBorders]="false"
+                [showRowLines]="true"
+                [showColumnLines]="false"
+                [rowAlternationEnabled]="true"
+                [columnAutoWidth]="true"
+                height="100%"
+                keyExpr="id"
+              >
+                <dxi-column
+                  caption="Acciones"
+                  [width]="100"
+                  [allowFiltering]="false"
+                  [allowSorting]="false"
+                  [allowResizing]="false"
+                  [fixed]="true"
+                  cellTemplate="actionsTemplate"
+                  alignment="center"
+                />
+                <dxi-column
+                  dataField="roleId"
+                  caption="Nombre del Rol"
+                  [calculateCellValue]="getRoleName.bind(this)"
+                  cellTemplate="roleNameTemplate"
+                />
+                <dxi-column
+                  dataField="createdAt"
+                  caption="Fecha Asignación"
+                  dataType="date"
+                  format="dd/MM/yyyy"
+                  [width]="180"
+                />
+
+                <div *dxTemplate="let data of 'roleNameTemplate'">
+                  <div class="flex items-center gap-2">
+                    <div class="h-2 w-2 rounded-full bg-indigo-500"></div>
+                    <span class="font-semibold text-slate-700"
+                      >{{ data.value }}</span
+                    >
+                  </div>
+                </div>
+
+                <div *dxTemplate="let data of 'actionsTemplate'">
+                  <dx-button
+                    icon="trash"
+                    hint="Remover rol"
+                    stylingMode="text"
+                    type="danger"
+                    class="hover:bg-red-50 !rounded-sm"
+                    (onClick)="onRemoveRole(data.data)"
+                    *hasRoles="['admin', 'super_admin']"
+                  />
+                </div>
+              </dx-data-grid>
+              }
+            </div>
+          </app-tab>
+        </app-tabs>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+
+<!-- Add Role Modal -->
+<app-modal
+  [isOpen]="showAddRoleModal()"
+  title="Asignar Rol"
+  confirmText="Asignar"
+  [confirmLoading]="addRoleLoading()"
+  [confirmDisabled]="!selectedId"
+  (closed)="closeAddRoleModal()"
+  (cancelled)="closeAddRoleModal()"
+  (confirmed)="confirmAddRole()"
+>
+  <div class="py-2">
+    <label class="block text-sm font-medium text-gray-700 mb-2"
+      >Seleccionar Rol</label
+    >
+    <dx-select-box
+      [dataSource]="rolesForSelect()"
+      displayExpr="name"
+      valueExpr="id"
+      placeholder="Seleccione un rol..."
+      [searchEnabled]="true"
+      [(value)]="selectedId"
+      width="100%"
+    />
+    @if (rolesForSelect().length === 0) {
+    <p class="text-sm text-gray-500 mt-2">
+      No hay roles disponibles para asignar
+    </p>
+    }
+  </div>
+</app-modal>
+
+<!-- Remove Role Modal -->
+<app-modal
+  [isOpen]="showRemoveRoleModal()"
+  title="Remover Rol"
+  confirmText="Remover"
+  confirmVariant="danger"
+  [confirmLoading]="removeRoleLoading()"
+  (closed)="closeRemoveRoleModal()"
+  (cancelled)="closeRemoveRoleModal()"
+  (confirmed)="confirmRemoveRole()"
+>
+  <p class="text-gray-600">
+    ¿Está seguro de remover el rol
+    <strong>{{ getRoleName(selectedUserRole()) }}</strong>
+    de este usuario?
+  </p>
+</app-modal>

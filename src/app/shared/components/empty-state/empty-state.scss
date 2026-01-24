@@ -1,0 +1,85 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.empty-state-container {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.icon-wrapper {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Estilos de botones (similar a list-controls)
+.list-controls-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 6px 12px;
+  min-height: 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.refresh {
+    background-color: #f0f4f8;
+    color: #0066cc;
+    border: 1px solid #d0d8e0;
+
+    &:hover:not(:disabled) {
+      background-color: #e6ecf3;
+      border-color: #0066cc;
+    }
+
+    &:active:not(:disabled) {
+      background-color: #d9e6f0;
+    }
+  }
+
+  &.create {
+    background-color: #0066cc;
+    color: white;
+    border: 1px solid #0052a3;
+
+    &:hover:not(:disabled) {
+      background-color: #0052a3;
+    }
+
+    &:active:not(:disabled) {
+      background-color: #003d7a;
+    }
+  }
+}
+

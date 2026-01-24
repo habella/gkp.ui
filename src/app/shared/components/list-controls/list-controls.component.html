@@ -1,0 +1,170 @@
+<div class="list-controls flex items-center gap-2 relative">
+  <!-- Botón Refresh -->
+  @if (hasControl('refresh')) {
+  <button
+    type="button"
+    class="list-controls-button refresh"
+    (click)="onRefresh()"
+    title="Refresh"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="23 4 23 10 17 10" />
+      <path d="M20.49 15a9 9 0 1 1-2-8.83" />
+    </svg>
+    <span>Refresh</span>
+  </button>
+  }
+
+  <!-- Botón Create -->
+  @if (hasControl('create')) {
+  <button
+    type="button"
+    class="list-controls-button create"
+    (click)="onCreate()"
+    [title]="createTitle()"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+    <span>{{ createTitle() }}</span>
+  </button>
+  }
+
+  <!-- Botón Save -->
+  @if (hasControl('save')) {
+  <button
+    type="button"
+    class="list-controls-button save"
+    (click)="onSave()"
+    [title]="saveTitle()"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+      />
+      <polyline points="17 21 17 13 7 13 7 21" />
+      <polyline points="7 3 7 8 15 8" />
+    </svg>
+    <span>{{ saveTitle() }}</span>
+  </button>
+  }
+  <!-- Custom Primary Buttons -->
+  @for (control of primaryCustomControls(); track control.id) {
+  <button
+    type="button"
+    class="list-controls-button custom-primary"
+    [style.color]="control.color || 'currentColor'"
+    [style.border-color]="control.color ? control.color : ''"
+    (click)="onCustomAction(control.id)"
+    [title]="control.tooltip || control.title"
+  >
+    @if (control.icon) { @if (isIconName(control.icon)) {
+    <svg-icon [src]="getIconPath(control.icon)" class="w-4 h-4"></svg-icon>
+    } @else {
+    <div class="icon-wrapper" [innerHTML]="control.icon"></div>
+    } }
+    <span>{{ control.title }}</span>
+  </button>
+  }
+  <!-- Input Search -->
+  @if (hasControl('search')) {
+  <input
+    type="text"
+    class="list-controls-search"
+    [placeholder]="searchPlaceholder()"
+    [value]="searchTerm()"
+    (input)="onSearch($any($event).target.value)"
+  />
+  }
+
+  <!-- Dropdown Menu Toggle (Secondary Options) -->
+  @if (secondaryCustomControls().length > 0) {
+  <div class="relative">
+    <button
+      type="button"
+      class="list-controls-button menu-toggle"
+      (click)="toggleMenu()"
+      title="More options"
+      [class.active]="menuOpen()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="1" />
+        <circle cx="12" cy="5" r="1" />
+        <circle cx="12" cy="19" r="1" />
+      </svg>
+    </button>
+
+    <!-- Dropdown Content -->
+    @if (menuOpen()) {
+    <div class="dropdown-menu">
+      @for (control of secondaryCustomControls(); track control.id) {
+      <button
+        type="button"
+        class="dropdown-item"
+        (click)="onCustomAction(control.id)"
+        [title]="control.tooltip || control.title"
+      >
+        @if (control.icon) { @if (isIconName(control.icon)) {
+        <svg-icon
+          [src]="getIconPath(control.icon)"
+          class="w-4 h-4"
+          [style.color]="control.color || 'currentColor'"
+        ></svg-icon>
+        } @else {
+        <div
+          class="icon-wrapper"
+          [innerHTML]="control.icon"
+          [style.color]="control.color || 'currentColor'"
+        ></div>
+        } }
+        <span [style.color]="control.color || 'inherit'">{{
+          control.title
+        }}</span>
+      </button>
+      }
+    </div>
+    }
+  </div>
+  }
+</div>

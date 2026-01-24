@@ -1,0 +1,73 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+::ng-deep {
+  .dx-form {
+    background: transparent;
+    .dx-field-item-label-text {
+      font-weight: 600;
+      color: #64748b;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dx-texteditor.dx-editor-outlined {
+      border-radius: 4px;
+      border-color: #e2e8f0;
+      background: #f8fafc;
+
+      &.dx-state-focused {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      }
+    }
+  }
+
+  .dx-datagrid {
+    background: transparent;
+
+    .dx-datagrid-headers {
+      background: transparent;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .dx-header-row > td {
+      font-weight: 700;
+      color: #94a3b8;
+      padding: 16px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dx-data-row > td {
+      padding: 16px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f8fafc;
+      color: #334155;
+      font-size: 0.875rem;
+    }
+
+    .dx-row-alt > td {
+      background-color: #fcfdfe;
+    }
+  }
+
+  .dx-selectbox {
+    .dx-texteditor-input {
+      padding: 10px 14px;
+    }
+  }
+}
+
+// Custom style for avatar and components
+.app-user-detail {
+  .dx-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

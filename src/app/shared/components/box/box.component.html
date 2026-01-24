@@ -1,0 +1,23 @@
+<div class="box-container" [class.box-compact]="variant() === 'compact'">
+  @if (shouldShowHeader()) {
+  <div class="box-header" [style.background-color]="headerColor()">
+    <div class="box-header-left">
+      @if (headerIcon()) {
+      <span class="box-icon" [style.color]="iconColor()">
+        <ng-container *ngTemplateOutlet="headerIcon()!"></ng-container>
+      </span>
+      } @if (title()) {
+      <span class="box-title">{{ title() }}</span>
+      } @if (subtitle()) {
+      <span class="box-subtitle">{{ subtitle() }}</span>
+      }
+    </div>
+    <div class="box-header-actions">
+      <ng-content select="[boxActions]"></ng-content>
+    </div>
+  </div>
+  }
+  <div class="box-content">
+    <ng-content></ng-content>
+  </div>
+</div>

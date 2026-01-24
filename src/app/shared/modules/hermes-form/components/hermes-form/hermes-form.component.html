@@ -1,0 +1,25 @@
+@if (isLoading()) {
+<div
+  class="py-5 rounded-lg flex bg-gray-50 border-slate-200 items-center justify-center h-full space-x-3"
+>
+  <div
+    class="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"
+  ></div>
+  <span class="text-sm text-gray-700 font-semibold">Cargando...</span>
+</div>
+} @if(isError()) {
+<div
+  class="py-5 flex bg-red-50 border border-red-100 items-center justify-center h-full space-x-3"
+>
+  <svg-icon
+    [src]="'./icons/alert-triangle.svg'"
+    [svgStyle]="{ 'width.rem': 1.1, 'height.rem': 1.1, color: 'red' }"
+    class="cursor-pointer"
+  ></svg-icon>
+  <span class="text-sm text-gray-700 font-semibold"
+    >Error al cargar el formulario...</span
+  >
+</div>
+} @if(isSussess()){
+<gui-df-ui [items]="formItems()" [datasource]="data()" />
+}

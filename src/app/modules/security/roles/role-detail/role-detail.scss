@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+::ng-deep {
+  .dx-form {
+    .dx-field-item-label-text {
+      font-weight: 500;
+      color: #374151;
+    }
+  }
+
+  .dx-textbox,
+  .dx-selectbox {
+    .dx-texteditor-input {
+      padding: 8px 12px;
+    }
+  }
+}

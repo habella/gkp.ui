@@ -1,0 +1,61 @@
+<div
+  class="tabs-header"
+  [class]="'tabs-' + variant()"
+  [class.no-top-border]="!showTopBorder()"
+  [style.background]="headerBackground()"
+>
+  @for (tab of tabs(); track tab.id() || $index) {
+  <button
+    type="button"
+    class="tab-button"
+    [class.active]="isActive(tab, $index)"
+    [class.disabled]="tab.disabled()"
+    [class.locked]="tab.locked()"
+    [class.is-action]="tab.isAction()"
+    [disabled]="tab.disabled() || tab.locked()"
+    (click)="selectTab(tab, $index)"
+  >
+    @if (tab.locked()) {
+    <span class="tab-lock-icon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </span>
+    } @else if (tab.icon()) {
+    <span class="tab-icon">
+      <ng-container *ngTemplateOutlet="tab.icon()!"></ng-container>
+    </span>
+    }
+    <span class="tab-label">{{ tab.label() }}</span>
+    @if (tab.badge() !== undefined) {
+    <span [class]="getBadgeClasses(tab)" [ngStyle]="getBadgeStyle(tab)">{{
+      tab.badge()
+    }}</span>
+    }
+  </button>
+  }
+
+  <div class="tabs-actions">
+    @for (tab of tabs(); track tab.id() || $index) { @if (isActive(tab, $index)
+    && tab.tabActions()) {
+    <ng-container *ngTemplateOutlet="tab.tabActions()!"></ng-container>
+    } }
+  </div>
+</div>
+
+<div class="tabs-content">
+  @for (tab of tabs(); track tab.id() || $index) { @if (isActive(tab, $index) &&
+  !tab.isAction()) {
+  <div class="tab-panel" [class.active]="isActive(tab, $index)">
+    <ng-container [ngTemplateOutlet]="tab.contentTemplate()"></ng-container>
+  </div>
+  } }
+</div>

@@ -1,0 +1,43 @@
+<div class="card-base p-6 hover:border-primary-200 transition-all duration-200">
+  <div class="flex items-start gap-4">
+    <!-- Icon Container -->
+    <div class="icon-container icon-container-lg bg-primary-50 flex-shrink-0">
+      <svg-icon
+        [src]="icon()"
+        [svgStyle]="{ 'width.rem': 1.5, 'height.rem': 1.5 }"
+        class="text-primary-600"
+      ></svg-icon>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 min-w-0">
+      <p class="text-sm text-surface-600 leading-relaxed">{{ message() }}</p>
+
+      <!-- Action slot / Default button -->
+      <div class="mt-4">
+        <ng-content>
+          <button
+            type="button"
+            class="action-btn action-btn-success"
+            (click)="add()"
+          >
+            <svg
+              class="w-4 h-4 mr-1.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Añadir {{ type() }}
+          </button>
+        </ng-content>
+      </div>
+    </div>
+  </div>
+</div>

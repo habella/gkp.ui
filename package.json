@@ -1,0 +1,64 @@
+{
+  "name": "fleet.ui",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "node --max-old-space-size=36384 ./node_modules/@angular/cli/bin/ng",
+    "start": "ng serve -o",
+    "build:prod": "ng build --configuration=production --aot --optimization",
+    "build:stg": "ng build --configuration=staging --aot --optimization",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/cdk": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "@ngrx/operators": "^20.1.0",
+    "@ngrx/signals": "^20.1.0",
+    "@rauroszm/hermes-ui-kit": "^26.1.0",
+    "angular-svg-icon": "19.1.1",
+    "devexpress-gantt": "^3.0.20",
+    "devextreme": "25.1.7",
+    "devextreme-angular": "25.1.7",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "file-saver-es": "^2.0.5",
+    "keycloak-angular": "^20.0.0",
+    "keycloak-js": "^26.1.2",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@angular/core": "^21.0.0",
+      "@angular/common": "^21.0.0",
+      "@angular/router": "^21.0.0",
+      "@angular/build": "^21.0.0"
+    }
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^21.0.0",
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "@ngx-env/builder": "^20.1.1",
+    "@types/file-saver-es": "^2.0.3",
+    "@types/jasmine": "~5.1.0",
+    "@types/node": "^22.13.4",
+    "jasmine-core": "~5.7.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "tailwindcss": "3",
+    "typescript": "~5.9.0"
+  }
+}

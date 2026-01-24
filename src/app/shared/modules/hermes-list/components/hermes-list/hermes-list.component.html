@@ -1,0 +1,176 @@
+@if (hasData()) {
+<gui-grid-view
+  [title]="'contractos'"
+  [datasource]="filteredData()"
+  [showFilterRow]="showFilterRow()"
+  [showExport]="showToolbar() && showExportButton()"
+  [showHeaderFilter]="showToolbar()"
+  [showSearch]="showToolbar()"
+>
+  @if (showToolbar()) {
+  <gui-grid-options>
+    @if (showCreateButton()) {
+    <button
+      type="button"
+      class="action-btn action-btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      (click)="openModal()"
+      [disabled]="isAnyActionLoading()"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+      Crear
+    </button>
+    } @if (showRefreshButton()) {
+    <button
+      type="button"
+      class="action-btn action-btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      (click)="loadItems(settings().query_list)"
+      [disabled]="isRefreshing()"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+      Actualizar
+    </button>
+    } @if (showExportButton()) {
+    <button
+      type="button"
+      class="action-btn action-btn-tertiary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      (click)="export()"
+      [disabled]="isAnyActionLoading()"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 19l9 2-9-18-9 18 9-2m0 0v-8m0 8H3m6-6V5a2 2 0 012-2h2a2 2 0 012 2v6m0 0h6"
+        />
+      </svg>
+      Exportar
+    </button>
+    }
+  </gui-grid-options>
+  }
+  <gui-grid-column
+    [name]="''"
+    [title]="'Acciones'"
+    [template]="actions"
+    [width]="100"
+  ></gui-grid-column>
+  @for (item of settings().columns; track $index) { @if(item.template){
+  <gui-grid-column
+    [name]="item.dataField"
+    [title]="item.caption"
+    [width]="item.width"
+    [dataType]="item.dataType"
+    [template]="item.template || empty"
+  ></gui-grid-column>
+  }@else{
+  <gui-grid-column
+    [name]="item.dataField"
+    [title]="item.caption"
+    [width]="item.width"
+    [dataType]="item.dataType"
+  ></gui-grid-column>
+  } }
+</gui-grid-view>
+} @else {
+<app-empty-state
+  [icon]="emptyStateConfig().icon || 'box'"
+  [title]="emptyStateConfig().title || 'No hay elementos'"
+  [subtitle]="
+    emptyStateConfig().subtitle || 'Comienza creando un nuevo elemento'
+  "
+  [showCreateButton]="showCreateButton()"
+  [showRefreshButton]="showRefreshButton()"
+  [createButtonText]="emptyStateConfig().createButtonText || 'Crear nuevo'"
+  [refreshButtonText]="emptyStateConfig().refreshButtonText || 'Refrescar'"
+  [isLoading]="isRefreshing()"
+  (create)="openModal()"
+  (refresh)="loadItems(settings().query_list)"
+/>
+}
+
+<ng-template #actions let-data="itemData" let-index="itemIndex">
+  <dx-drop-down-button
+    icon="preferences"
+    [splitButton]="true"
+    width="auto"
+    [useSelectMode]="false"
+    [dropDownOptions]="{ width: 200 }"
+    (onItemClick)="itemAction($event, data)"
+  >
+    <dxi-item [text]="'Editar'" [icon]="'edit'" [id]="1"></dxi-item>
+    <dxi-item [text]="'Eliminar'" [icon]="'trash'" [id]="2"></dxi-item>
+  </dx-drop-down-button>
+</ng-template>
+
+<ng-template #empty> </ng-template>
+
+<!-- Modal para crear/editar -->
+<app-modal
+  [isOpen]="isModalOpen()"
+  [title]="settings().title"
+  [size]="'md'"
+  confirmText="Guardar"
+  cancelText="Cancelar"
+  [confirmLoading]="isLoading()"
+  [confirmDisabled]="!isFormValid()"
+  (closed)="closeModal()"
+  (cancelled)="closeModal()"
+  (confirmed)="onSaveClick()"
+>
+  <!-- Icono del header -->
+  <ng-template #headerIcon>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+      ></path>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    </svg>
+  </ng-template>
+
+  <hermes-form
+    #form
+    [code]="settings().query_form"
+    [properties]="settings().query_form_properties"
+    [id]="id()"
+    (onSaved)="onSavedHandler($event)"
+    (onSavedComplete)="onSaveComplete($event)"
+  />
+</app-modal>

@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+::ng-deep {
+  .dx-textbox,
+  .dx-textarea {
+    .dx-texteditor-input {
+      padding: 8px 12px;
+    }
+  }
+
+  .dx-textarea {
+    .dx-texteditor-input {
+      min-height: 80px;
+    }
+  }
+}
