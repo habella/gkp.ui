@@ -2,6 +2,7 @@ import { CommonModule, DatePipe } from '@angular/common'
 import {
   Component,
   computed,
+  effect,
   inject,
   Input,
   OnInit,
@@ -101,6 +102,11 @@ export class UserDetailComponent implements OnInit {
   availableRoles = signal<IRole[]>([])
   rolesLoading = signal(false)
 
+  // Permissions
+  userPermissions = signal<string[]>([])
+  permissionsLoading = signal(false)
+  permissionsLoaded = signal(false)
+
   private _selectedRoleId: string | null = null
   get selectedId(): string | null {
     return this._selectedRoleId
@@ -122,6 +128,19 @@ export class UserDetailComponent implements OnInit {
   pageTitle = computed(() =>
     this.isNew() ? 'Nuevo Usuario' : 'Editar Usuario',
   )
+
+  constructor() {
+    // Lazy load permissions when moving to permissions tab or roles change
+    effect(() => {
+      const tab = this.activeTab()
+      const userId = this.userId()
+      const roles = this.userRoles() // Dependency to re-sync if roles change
+
+      if (tab === 'permissions' && userId && userId !== 'new') {
+        this.loadUserPermissions()
+      }
+    })
+  }
 
   // Computed: roles available to add (not already assigned)
   rolesForSelect = computed(() => {
@@ -176,6 +195,34 @@ export class UserDetailComponent implements OnInit {
   onRefreshRoles(): void {
     this.loadUserRoles()
     this.notify.success('Lista de roles actualizada')
+  }
+
+  onViewRole(userRole: IUserRoleRelation): void {
+    if (!userRole.roleId) return
+    this.router.navigate(['/roles', userRole.roleId])
+  }
+
+  loadUserPermissions(): void {
+    const id = this.userId()
+    if (!id) return
+
+    this.permissionsLoading.set(true)
+    this.userService.getPermissionsById(id).subscribe({
+      next: (permissions) => {
+        this.userPermissions.set(permissions)
+        this.permissionsLoading.set(false)
+        this.permissionsLoaded.set(true)
+      },
+      error: () => {
+        this.notify.error('Error al cargar permisos del usuario')
+        this.permissionsLoading.set(false)
+      },
+    })
+  }
+
+  onRefreshPermissions(): void {
+    this.loadUserPermissions()
+    this.notify.success('Lista de permisos actualizada')
   }
 
   loadAvailableRoles(): void {
@@ -317,6 +364,10 @@ export class UserDetailComponent implements OnInit {
     navigator.clipboard.writeText(text).then(() => {
       this.notify.success('Copiado al portapapeles')
     })
+  }
+
+  getPermissionName(data: any): string {
+    return typeof data === 'string' ? data : ''
   }
 
   // Helpers

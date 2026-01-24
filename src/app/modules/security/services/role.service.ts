@@ -7,6 +7,7 @@ import {
   IRole,
   IRolePermissionRelation,
   IUpdateRoleRequest,
+  IUserRoleRelation,
 } from '../models'
 
 @Injectable({
@@ -28,6 +29,13 @@ export class RoleService {
    */
   getById(roleId: string): Observable<IRole> {
     return this.base.get<IRole>(`${this.API}/${roleId}`)
+  }
+
+  /**
+   * Get users assigned to a role
+   */
+  getUsersByRoleId(roleId: string): Observable<IUserRoleRelation[]> {
+    return this.base.get<IUserRoleRelation[]>(`${this.API}/${roleId}/user`)
   }
 
   /**

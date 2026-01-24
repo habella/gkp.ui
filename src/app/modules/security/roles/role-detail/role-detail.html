@@ -213,6 +213,110 @@
           }
         </div>
       </app-tab>
+
+      <!-- USERS Tab -->
+      <app-tab label="Usuarios" id="users" [badge]="roleUsers().length">
+        <ng-template #tabActions>
+          <div class="flex gap-2">
+            <dx-button
+              text="Actualizar"
+              icon="refresh"
+              hint="Refrescar"
+              type="success"
+              stylingMode="contained"
+              class="!rounded-sm shadow-sm"
+              (onClick)="onRefreshUsers()"
+            />
+          </div>
+        </ng-template>
+
+        <div class="p-4 h-full">
+          @if (usersLoading()) {
+          <div class="flex items-center justify-center h-48">
+            <dx-load-indicator [visible]="true" height="30" width="30" />
+          </div>
+          } @else if (roleUsers().length === 0) {
+          <div
+            class="flex flex-col items-center justify-center h-64 text-slate-400 bg-slate-50/50 rounded-sm border border-dashed border-slate-200 m-4"
+          >
+            <div class="bg-white p-3 rounded-sm shadow-sm mb-4">
+              <i class="dx-icon-group text-3xl text-slate-200"></i>
+            </div>
+            <p class="text-sm font-medium">
+              No hay usuarios asignados a este rol
+            </p>
+          </div>
+          } @else {
+          <dx-data-grid
+            [dataSource]="roleUsers()"
+            [showBorders]="false"
+            [showRowLines]="true"
+            [showColumnLines]="false"
+            [rowAlternationEnabled]="true"
+            [columnAutoWidth]="true"
+            height="100%"
+            keyExpr="id"
+          >
+            <dxo-filter-row [visible]="true" />
+            <dxo-header-filter [visible]="true" />
+            <dxo-paging [pageSize]="20" />
+            <dxo-pager
+              [showPageSizeSelector]="true"
+              [allowedPageSizes]="[10, 20, 50]"
+              [showInfo]="true"
+              [showNavigationButtons]="true"
+            />
+
+            <dxi-column
+              caption="Acciones"
+              [width]="100"
+              [allowFiltering]="false"
+              [allowSorting]="false"
+              [allowResizing]="false"
+              [fixed]="true"
+              cellTemplate="actionsTemplate"
+              alignment="center"
+            />
+            <dxi-column
+              name="user_email"
+              caption="Email"
+              [calculateCellValue]="getUserEmail.bind(this)"
+              sortOrder="asc"
+              [width]="300"
+              [allowHeaderFiltering]="true"
+            />
+            <dxi-column
+              name="user_name"
+              caption="Nombre completo"
+              [calculateCellValue]="getUserFullName.bind(this)"
+              [allowHeaderFiltering]="true"
+            />
+            <div
+              *dxTemplate="let data of 'actionsTemplate'"
+              class="flex items-center justify-center gap-1"
+            >
+              <dx-button
+                icon="eyeopen"
+                hint="Ver detalle del usuario"
+                stylingMode="text"
+                type="default"
+                class="hover:bg-slate-50 !rounded-sm"
+                (onClick)="onViewUser(data.data)"
+              />
+              <dx-button
+                icon="trash"
+                hint="Remover usuario del rol"
+                stylingMode="text"
+                type="danger"
+                class="hover:bg-red-50 !rounded-sm"
+                (onClick)="onRemoveUser(data.data)"
+                *hasRoles="['admin', 'super_admin']"
+              />
+            </div>
+          </dx-data-grid>
+          }
+        </div>
+      </app-tab>
     </app-tabs>
     }
   </div>
@@ -321,6 +425,24 @@
       >{{ getPermissionName(selectedRolePermission()?.permissionId || '')
       }}</strong
     >
+    de este rol?
+  </p>
+</app-modal>
+
+<!-- Remove User Modal -->
+<app-modal
+  [isOpen]="showRemoveUserModal()"
+  title="Remover Usuario del Rol"
+  confirmText="Remover"
+  confirmVariant="danger"
+  [confirmLoading]="removeUserLoading()"
+  (closed)="closeRemoveUserModal()"
+  (cancelled)="closeRemoveUserModal()"
+  (confirmed)="confirmRemoveUser()"
+>
+  <p class="text-gray-600">
+    ¿Está seguro de remover al usuario
+    <strong>{{ getUserFullName(selectedUserRole()) }}</strong>
     de este rol?
   </p>
 </app-modal>

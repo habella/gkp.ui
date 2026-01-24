@@ -53,6 +53,13 @@ export class UserService {
   }
 
   /**
+   * Get permissions for a specific user
+   */
+  getPermissionsById(id: string): Observable<string[]> {
+    return this.base.get<string[]>(`${this.API}/${id}/permissions`)
+  }
+
+  /**
    * Register a new user
    */
   register(data: IRegisterUserRequest): Observable<IUser> {

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common'
 import {
   Component,
   computed,
@@ -26,18 +27,21 @@ import {
   IRole,
   IRolePermissionRelation,
   IUpdateRoleRequest,
+  IUserRoleRelation,
 } from '../../models'
 import { IPermission } from '../../models/permission.model'
 import {
   PermissionService,
   RolePermissionRelationService,
   RoleService,
+  UserRoleRelationService,
 } from '../../services'
 
 @Component({
   selector: 'app-role-detail',
   standalone: true,
   imports: [
+    CommonModule,
     DxFormModule,
     DxButtonModule,
     DxLoadIndicatorModule,
@@ -61,6 +65,7 @@ export class RoleDetailComponent implements OnInit {
   private readonly router = inject(Router)
   private readonly roleService = inject(RoleService)
   private readonly rolePermissionService = inject(RolePermissionRelationService)
+  private readonly userRoleService = inject(UserRoleRelationService)
   private readonly permissionService = inject(PermissionService)
   private readonly notify = inject(NotifyService)
 
@@ -89,6 +94,10 @@ export class RoleDetailComponent implements OnInit {
   permissionsLoading = signal(false)
   selectedPermissionIds = signal<string[]>([])
 
+  // Users management
+  roleUsers = signal<IUserRoleRelation[]>([])
+  usersLoading = signal(false)
+
   // Add permission modal
   showAddPermissionModal = signal(false)
   addPermissionLoading = signal(false)
@@ -98,12 +107,19 @@ export class RoleDetailComponent implements OnInit {
   removePermissionLoading = signal(false)
   selectedRolePermission = signal<IRolePermissionRelation | null>(null)
 
+  // Remove user modal
+  showRemoveUserModal = signal(false)
+  removeUserLoading = signal(false)
+  selectedUserRole = signal<IUserRoleRelation | null>(null)
+
   private permissionsLoaded = false
   private availablePermissionsLoaded = false
+  private usersLoaded = false
 
   constructor() {
     effect(() => {
-      if (this.activeTab() === 'permissions' && !this.isNew()) {
+      const tab = this.activeTab()
+      if (tab === 'permissions' && !this.isNew()) {
         if (!this.permissionsLoaded) {
           this.loadRolePermissions()
           this.permissionsLoaded = true
@@ -112,6 +128,11 @@ export class RoleDetailComponent implements OnInit {
           this.loadAvailablePermissions()
           this.availablePermissionsLoaded = true
         }
+      }
+
+      if (tab === 'users' && !this.isNew() && !this.usersLoaded) {
+        this.loadRoleUsers()
+        this.usersLoaded = true
       }
     })
   }
@@ -187,6 +208,83 @@ export class RoleDetailComponent implements OnInit {
   onRefreshPermissions(): void {
     this.loadRolePermissions()
     this.notify.success('Lista de permisos actualizada')
+  }
+
+  // Users management
+  loadRoleUsers(): void {
+    const id = this.roleId()
+    if (!id) return
+
+    this.usersLoading.set(true)
+    this.roleService.getUsersByRoleId(id).subscribe({
+      next: (users) => {
+        this.roleUsers.set(users)
+        this.usersLoading.set(false)
+      },
+      error: () => {
+        this.notify.error('Error al cargar los usuarios del rol')
+        this.usersLoading.set(false)
+      },
+    })
+  }
+
+  onRefreshUsers(): void {
+    this.loadRoleUsers()
+    this.notify.success('Lista de usuarios actualizada')
+  }
+
+  getUserFullName(data: any): string {
+    const user = data?.user || data
+    if (!user || (!user.firstName && !user.lastName)) return ''
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim()
+  }
+
+  getUserEmail(data: any): string {
+    const user = data?.user || data
+    return user?.email || ''
+  }
+
+  onViewUser(userRole: IUserRoleRelation): void {
+    const userId = userRole.userId || (userRole as any).id
+    if (!userId) return
+    this.router.navigate(['/users', userId])
+  }
+
+  onRemoveUser(userRole: IUserRoleRelation): void {
+    this.selectedUserRole.set(userRole)
+    this.showRemoveUserModal.set(true)
+  }
+
+  confirmRemoveUser(): void {
+    const userRole = this.selectedUserRole()
+    if (!userRole) return
+
+    const relationId = userRole.id
+    if (!relationId) {
+      this.notify.error(
+        'No se puede remover el usuario: ID de relación no encontrado',
+      )
+      return
+    }
+
+    this.removeUserLoading.set(true)
+    this.userRoleService.delete(relationId).subscribe({
+      next: () => {
+        this.notify.success('Usuario removido del rol correctamente')
+        this.closeRemoveUserModal()
+        this.loadRoleUsers()
+      },
+      error: () => {
+        this.notify.error('Error al remover el usuario')
+        this.removeUserLoading.set(false)
+      },
+    })
+  }
+
+  closeRemoveUserModal(): void {
+    this.showRemoveUserModal.set(false)
+    this.removeUserLoading.set(false)
+    this.selectedUserRole.set(null)
   }
 
   loadAvailablePermissions(): void {

@@ -369,20 +369,103 @@
                 </div>
 
                 <div *dxTemplate="let data of 'actionsTemplate'">
-                  <dx-button
-                    icon="trash"
-                    hint="Remover rol"
-                    stylingMode="text"
-                    type="danger"
-                    class="hover:bg-red-50 !rounded-sm"
-                    (onClick)="onRemoveRole(data.data)"
-                    *hasRoles="['admin', 'super_admin']"
-                  />
+                  <div class="flex items-center justify-center gap-1">
+                    <dx-button
+                      icon="eyeopen"
+                      hint="Ver detalle del rol"
+                      stylingMode="text"
+                      type="default"
+                      class="hover:bg-slate-50 !rounded-sm"
+                      (onClick)="onViewRole(data.data)"
+                    />
+                    <dx-button
+                      icon="trash"
+                      hint="Remover rol"
+                      stylingMode="text"
+                      type="danger"
+                      class="hover:bg-red-50 !rounded-sm"
+                      (onClick)="onRemoveRole(data.data)"
+                      *hasRoles="['admin', 'super_admin']"
+                    />
+                  </div>
                 </div>
               </dx-data-grid>
               }
             </div>
           </app-tab>
+
+          <!-- PERMISSIONS Tab -->
+          @if (!isNew()) {
+          <app-tab
+            label="Permisos"
+            id="permissions"
+            [badge]="userPermissions().length"
+          >
+            <ng-template #tabActions>
+              <div class="flex gap-2">
+                <dx-button
+                  text="Actualizar"
+                  icon="refresh"
+                  hint="Refrescar"
+                  type="success"
+                  stylingMode="contained"
+                  class="!rounded-sm shadow-sm"
+                  (onClick)="onRefreshPermissions()"
+                />
+              </div>
+            </ng-template>
+
+            <div class="p-4 h-full">
+              @if (permissionsLoading()) {
+              <div class="flex items-center justify-center h-48">
+                <dx-load-indicator [visible]="true" height="30" width="30" />
+              </div>
+              } @else if (userPermissions().length === 0) {
+              <div
+                class="flex flex-col items-center justify-center h-64 text-slate-400 bg-slate-50/50 rounded-sm border border-dashed border-slate-200 m-4"
+              >
+                <div class="bg-white p-3 rounded-sm shadow-sm mb-4">
+                  <i class="dx-icon-fields text-3xl text-slate-200"></i>
+                </div>
+                <p class="text-sm font-medium">
+                  No se encontraron permisos para este usuario
+                </p>
+                <p class="text-xs text-slate-400 mt-1">
+                  Los permisos se heredan de los roles asignados
+                </p>
+              </div>
+              } @else {
+              <dx-data-grid
+                [dataSource]="userPermissions()"
+                [showBorders]="false"
+                [showRowLines]="true"
+                [showColumnLines]="false"
+                [rowAlternationEnabled]="true"
+                [columnAutoWidth]="true"
+                height="100%"
+              >
+                <dxo-filter-row [visible]="true" />
+                <dxo-header-filter [visible]="true" />
+                <dxo-group-panel [visible]="false" />
+                <dxo-paging [pageSize]="20" />
+                <dxo-pager
+                  [showPageSizeSelector]="true"
+                  [allowedPageSizes]="[20, 50, 100]"
+                  [showInfo]="true"
+                  [showNavigationButtons]="true"
+                />
+
+                <dxi-column
+                  caption="Nombre del Permiso"
+                  [calculateCellValue]="getPermissionName.bind(this)"
+                  [minWidth]="300"
+                  sortOrder="asc"
+                />
+              </dx-data-grid>
+              }
+            </div>
+          </app-tab>
+          }
         </app-tabs>
       </div>
     </div>
