@@ -8,19 +8,22 @@ import {
 } from 'keycloak-angular'
 
 import Keycloak from 'keycloak-js'
+import { getEnv } from './core/get-env'
 
 export const provideKeycloakAngular = () =>
   provideKeycloak({
     config: {
-      url: import.meta.env['NG_APP_KEYCLOAK_URL'],
-      realm: import.meta.env['NG_APP_KEYCLOAK_REALM'],
-      clientId: import.meta.env['NG_APP_KEYCLOAK_CLIENT_ID'],
+      url: getEnv('NG_APP_KEYCLOAK_URL'),
+      realm: getEnv('NG_APP_KEYCLOAK_REALM'),
+      clientId: getEnv('NG_APP_KEYCLOAK_CLIENT_ID'),
     },
     initOptions: {
       onLoad: 'check-sso',
-      silentCheckSsoRedirectUri:
-        window.location.origin + '/silent-check-sso.html',
-      redirectUri: window.location.origin + '/#/',
+      silentCheckSsoRedirectUri: new URL(
+        'silent-check-sso.html',
+        document.baseURI,
+      ).href,
+      redirectUri: new URL('#/', document.baseURI).href,
       checkLoginIframe: false,
       responseMode: 'query',
     },

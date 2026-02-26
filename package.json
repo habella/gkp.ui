@@ -4,11 +4,13 @@
   "scripts": {
     "ng": "node --max-old-space-size=36384 ./node_modules/@angular/cli/bin/ng",
     "start": "ng serve -o",
-    "build:prod": "ng build --configuration=production --aot --optimization",
-    "build:stg": "ng build --configuration=staging --aot --optimization",
+    "build:prod": "ng build --configuration=production",
+    "build:stg": "ng build --configuration=staging",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "docker:build": "docker compose -f devops/docker-compose.yml build",
+    "docker:run": "docker compose -f devops/docker-compose.yml up"
   },
   "private": true,
   "dependencies": {

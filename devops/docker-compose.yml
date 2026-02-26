@@ -1,0 +1,16 @@
+services:
+  gatekeeper:
+    build:
+      context: ..
+      dockerfile: devops/Dockerfile
+      secrets:
+        - npmrc
+    image: gatekeeper:latest
+    ports:
+      - '8084:80'
+    env_file:
+      - ../.env
+
+secrets:
+  npmrc:
+    file: ../.npmrc
